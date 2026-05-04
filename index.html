@@ -2019,9 +2019,9 @@
         <h2>Operations Snapshot</h2>
         <div class="hero-metrics">
           <div class="metric"><span>MOBs</span><strong>4 tracked</strong></div>
-          <div class="metric"><span>Looks</span><strong>8 x 10</strong></div>
-          <div class="metric"><span>Execution</span><strong>2-3 / 7-8</strong></div>
-          <div class="metric"><span>Cycle</span><strong>145 min</strong></div>
+          <div class="metric"><span>Planning</span><strong>45 min</strong></div>
+          <div class="metric"><span>Execution</span><strong>T1 / T2</strong></div>
+          <div class="metric"><span>Cycle</span><strong>140 min</strong></div>
         </div>
       </div>
     </div>
@@ -2151,16 +2151,12 @@
         <div class="stat">
           <label for="currentLook">Current Look</label>
           <select id="currentLook">
-            <option>Planning / Pre-Brief</option>
-            <option>Look 1</option>
-            <option>Look 2 - Execution Window</option>
-            <option>Look 3 - Execution Window</option>
-            <option>Look 4</option>
-            <option>Look 5</option>
-            <option>Look 6</option>
-            <option>Look 7 - Execution Window</option>
-            <option>Look 8 - Execution Window</option>
-            <option>Debrief</option>
+            <option>Mission Planning</option>
+            <option>Mission Pre-Brief</option>
+            <option>Turn 1 Execution</option>
+            <option>Turn 2 Planning</option>
+            <option>Turn 2 Execution</option>
+            <option>Hotwash / Debrief</option>
           </select>
         </div>
         <div class="stat">
@@ -2177,9 +2173,9 @@
       <div class="tag-row">
         <div class="tag">Common Operating Picture</div>
         <div class="tag">4 MOB / FOS Nodes</div>
-        <div class="tag">8 Operational Looks</div>
+        <div class="tag">CAOC Mission Cycle</div>
         <div class="tag">CSpOC Bridge</div>
-        <div class="tag">Execution Windows: Looks 2-3 &amp; 7-8</div>
+        <div class="tag">Execution Windows: Turn 1 &amp; Turn 2</div>
       </div>
     </section>
 
@@ -2187,34 +2183,34 @@
       <h2>2. Mission Timeline &amp; Operating Flow</h2>
       <div class="timeline">
         <div class="phase-card phase-plan">
-          <strong>Planning + Pre-Brief</strong>
-          <span>45 min</span>
-          <p>Base selection, FOS plan, ISR priorities, initial coordination.</p>
+          <strong>Mission Planning</strong>
+          <span>00:00-00:30</span>
+          <p>CAOC, MOBs, and CSpOC conduct joint planning, order reviews, political assessments, RFIs, and aircraft apportionment.</p>
         </div>
-        <div class="phase-card">
-          <strong>Look 1</strong>
-          <span>10 min</span>
-          <p>Initial space and threat assessment.</p>
-        </div>
-        <div class="phase-card phase-exec">
-          <strong>Looks 2-3</strong>
-          <span>20 min</span>
-          <p>Execution Window #1. Push rapid recommendations.</p>
-        </div>
-        <div class="phase-card">
-          <strong>Looks 4-6</strong>
-          <span>30 min</span>
-          <p>Reassess, sustain, reposition, and adapt.</p>
+        <div class="phase-card phase-plan">
+          <strong>Mission Pre-Brief</strong>
+          <span>00:30-00:45</span>
+          <p>Mission Commanders brief teams and instructors. Missed RFIs are answered before execution.</p>
         </div>
         <div class="phase-card phase-exec">
-          <strong>Looks 7-8</strong>
-          <span>20 min</span>
-          <p>Execution Window #2. Final decisive actions.</p>
+          <strong>Turn 1 Execution</strong>
+          <span>00:45-01:10</span>
+          <p>MOBs report final ATOs, fighter munitions, and risk tokens to CAOC for execution.</p>
+        </div>
+        <div class="phase-card">
+          <strong>Turn 2 Planning</strong>
+          <span>01:10-01:35</span>
+          <p>Plan the subsequent turn based on updated threats, RFIs, aircraft availability, and CSpOC effects.</p>
+        </div>
+        <div class="phase-card phase-exec">
+          <strong>Turn 2 Execution</strong>
+          <span>01:35-02:00</span>
+          <p>Execute second-turn ATOs, risk tokens, munitions, and final MOB-to-CAOC reporting.</p>
         </div>
         <div class="phase-card phase-debrief">
-          <strong>Debrief</strong>
-          <span>20 min</span>
-          <p>Capture lessons, results, and evaluation points.</p>
+          <strong>Hotwash / Debrief</strong>
+          <span>02:00-02:20</span>
+          <p>Instructor feedback, mission effects, decisions, gaps, and lessons learned.</p>
         </div>
       </div>
     </section>
@@ -2682,16 +2678,12 @@ Turn 8:
     const FIREBASE_PATH = "mobDashboard/sharedState";
 
     const missionSegments = [
-      { name: "Planning / Pre-Brief", start: 0, end: 45, reminder: "Build the plan: confirm assigned MOB, FOS intent, ISR priorities, COMM plan, and CSpOC support requests." },
-      { name: "Look 1", start: 45, end: 55, reminder: "Initial look: collect first threat picture and push only critical changes to the MOB Commander." },
-      { name: "Look 2 - Execution Window", start: 55, end: 65, hot: true, reminder: "EXECUTION WINDOW #1: be ready to pass Threat-Impact-Recommendation updates immediately." },
-      { name: "Look 3 - Execution Window", start: 65, end: 75, hot: true, reminder: "EXECUTION WINDOW #1 continues: confirm GPS, cyber, jammer, and route impacts before decisions lock." },
-      { name: "Look 4", start: 75, end: 85, reminder: "Reassess: update FOS risk, threat trends, COMM degradation, and follow-on requests to CSpOC." },
-      { name: "Look 5", start: 85, end: 95, reminder: "Sustain: check mobility routing, jammers, weather, and whether the MOB needs revised space effects." },
-      { name: "Look 6", start: 95, end: 105, warn: true, reminder: "Prepare for final execution window: pre-stage recommended actions for Looks 7-8." },
-      { name: "Look 7 - Execution Window", start: 105, end: 115, hot: true, reminder: "EXECUTION WINDOW #2: push final threat, jammer, GPS/cyber, and COMM recommendations." },
-      { name: "Look 8 - Execution Window", start: 115, end: 125, hot: true, reminder: "FINAL EXECUTION: capture decisions and prepare debrief notes while maintaining real-time updates." },
-      { name: "Debrief", start: 125, end: 145, reminder: "Debrief: summarize what changed, what you recommended, what was decided, and the operational effect." }
+      { name: "Mission Planning", start: 0, end: 30, reminder: "Mission Planning: CAOC, MOBs, and CSpOC conduct joint planning. Review orders, political constraints, RFIs, aircraft apportionment, and space support requests." },
+      { name: "Mission Pre-Brief", start: 30, end: 45, warn: true, reminder: "Mission Pre-Brief: Mission Commanders brief their team and instructor. Finalize RFIs, execution priorities, and commander guidance." },
+      { name: "Turn 1 Execution", start: 45, end: 70, hot: true, reminder: "TURN 1 EXECUTION: MOBs report final ATOs, fighter munitions, risk tokens, threats, and execution decisions to CAOC." },
+      { name: "Turn 2 Planning", start: 70, end: 95, reminder: "Turn 2 Planning: Reassess threats, FOS posture, aircraft availability, RFIs, political constraints, and CSpOC support needs." },
+      { name: "Turn 2 Execution", start: 95, end: 120, hot: true, reminder: "TURN 2 EXECUTION: Execute second-turn ATOs, confirm risk tokens, space effects, munitions, and final MOB-to-CAOC reporting." },
+      { name: "Hotwash / Debrief", start: 120, end: 140, reminder: "Hotwash/Debrief: Capture instructor feedback, decisions made, mission effects, gaps, and lessons learned." }
     ];
 
     let missionClock = {
