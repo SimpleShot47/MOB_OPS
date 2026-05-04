@@ -186,6 +186,69 @@
       font-size: 0.82rem;
     }
 
+    .mission-time-control {
+      margin-top: 14px;
+      padding: 12px;
+      border: 1px solid rgba(0, 255, 65, 0.28);
+      border-radius: 14px;
+      background: rgba(0, 255, 65, 0.06);
+    }
+
+    .mission-time-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: #b7ffbf;
+      font-weight: 900;
+    }
+
+    .mission-time-header span:last-child {
+      color: #72ff8f;
+      font-size: 0.82rem;
+      text-align: right;
+    }
+
+    .mission-time-slider {
+      width: 100%;
+      accent-color: #00ff41;
+      cursor: pointer;
+    }
+
+    .mission-time-labels {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(110px, 1fr));
+      gap: 6px;
+      margin-top: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .time-chip {
+      border: 1px solid #1d5f2a;
+      border-radius: 999px;
+      padding: 6px 8px;
+      background: rgba(0, 10, 0, 0.88);
+      color: #72ff8f;
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-align: center;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .time-chip.active {
+      background: #00ff41;
+      color: #001500;
+      box-shadow: 0 0 12px rgba(0, 255, 65, 0.38);
+    }
+
+    .time-chip.execution {
+      border-color: #00ff41;
+      box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.12);
+    }
+
     .reminder-list {
       display: grid;
       gap: 8px;
@@ -1919,6 +1982,28 @@
       }
     }
   </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPBNBM6mq1s6i_7X4LTJgr9ONUXTy4oIw",
+      authDomain: "mob-ops-dashboard.firebaseapp.com",
+      databaseURL: "https://mob-ops-dashboard-default-rtdb.firebaseio.com",
+      projectId: "mob-ops-dashboard",
+      storageBucket: "mob-ops-dashboard.firebasestorage.app",
+      messagingSenderId: "492770941172",
+      appId: "1:492770941172:web:8d5b1df4d3b27a0ba666a1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    window.firebaseDb = database;
+    window.firebaseRef = ref;
+    window.firebaseSet = set;
+    window.firebaseOnValue = onValue;
+  </script>
 </head>
 
 <body>
@@ -1943,7 +2028,15 @@
 
     <div class="ops-clock-panel" aria-label="Operation clock and reminders">
       <div class="clock-card">
-        <div class="eyebrow">Live Mission Clock</div>
+        <div class="eyebrow">Mission Time Control</div>
+        <div class="mission-time-control">
+          <div class="mission-time-header">
+            <span id="missionTimeBlockName">Mission Planning</span>
+            <span id="missionTimeBlockWindow">00:00-00:30</span>
+          </div>
+          <input id="missionTimeSlider" class="mission-time-slider" type="range" min="0" max="140" step="1" value="0" oninput="setMissionElapsedFromSlider(this.value)" />
+          <div id="missionTimeLabels" class="mission-time-labels"></div>
+        </div>
         <div class="clock-grid">
           <div class="clock-tile">
             <span>Local Time</span>
@@ -1979,10 +2072,10 @@
           </div>
         </div>
         <div class="clock-controls">
-          <button onclick="startMissionClock()" class="green">Start Clock</button>
+          <button onclick="startMissionClock()" class="green">Start</button>
           <button onclick="pauseMissionClock()" class="amber">Pause</button>
-          <button onclick="resetMissionClock()" class="red">Reset Clock</button>
-          <button onclick="markCurrentLook()" class="cyan">Sync Look Dropdown</button>
+          <button onclick="resetMissionClock()" class="red">Reset</button>
+          <button onclick="snapToCurrentBlockStart()" class="cyan">Snap Block Start</button>
         </div>
       </div>
 
@@ -2165,7 +2258,9 @@
           </div>
           <div class="field" style="margin-top:14px;">
             <label for="geoTurnNotes">GEO / CSpOC Turn-by-Turn Notes</label>
-            <textarea id="geoTurnNotes">Turn 1:
+            <textarea id="geoTurnNotes">
+                            
+Turn 1:
 - GEO focus:
 - Key satellites:
 - ISR/SDA findings:
@@ -2235,7 +2330,9 @@ Turn 8:
 - Threats/jammers:
 - COMM/GPS opportunities:
 - MOB impact:
-- Recommended action:</textarea>
+- Recommended action:
+
+</textarea>
             <small>Use this running GEO log to track satellite movement, orbital threats, COMM/GPS opportunities, and
               CSpOC recommendations each turn.</small>
           </div>
@@ -2582,6 +2679,7 @@ Turn 8:
   <script>
     const STORAGE_KEY = "mobLnoOpsTool_v2";
     const CLOCK_KEY = "mobLnoMissionClock_v1";
+    const FIREBASE_PATH = "mobDashboard/sharedState";
 
     const missionSegments = [
       { name: "Planning / Pre-Brief", start: 0, end: 45, reminder: "Build the plan: confirm assigned MOB, FOS intent, ISR priorities, COMM plan, and CSpOC support requests." },
@@ -2760,8 +2858,38 @@ Turn 8:
     function saveAll(showAlert = true) {
       state.inputs = getInputs();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      syncStateToFirebase();
       saveClock();
       if (showAlert) alert("Saved. Your MOB LNO tracker is stored in this browser.");
+    }
+
+    function syncStateToFirebase() {
+      if (!window.firebaseDb || !window.firebaseRef || !window.firebaseSet) return;
+      const dbRef = window.firebaseRef(window.firebaseDb, FIREBASE_PATH);
+      window.firebaseSet(dbRef, {
+        ...state,
+        lastUpdated: Date.now()
+      }).catch(err => console.error("Firebase sync failed:", err));
+    }
+
+    function startFirebaseSync() {
+      if (!window.firebaseDb || !window.firebaseRef || !window.firebaseOnValue) return;
+      const dbRef = window.firebaseRef(window.firebaseDb, FIREBASE_PATH);
+      window.firebaseOnValue(dbRef, (snapshot) => {
+        const remoteState = snapshot.val();
+        if (!remoteState) return;
+        state = {
+          ...state,
+          ...remoteState
+        };
+        renderMaps();
+        renderFos();
+        renderThreats();
+        renderSpaceRequests();
+        renderLogs();
+        setInputs(state.inputs || {});
+        updateClockDisplays();
+      });
     }
 
     function loadAll() {
@@ -2790,6 +2918,7 @@ Turn 8:
       loadClock();
       startClockLoop();
       updateClockDisplays();
+      startFirebaseSync();
     }
     function handleMapUpload(event, type) {
       const file = event.target.files?.[0];
