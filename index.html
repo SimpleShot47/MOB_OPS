@@ -1,0 +1,3324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Unified MOB common operating dashboard for CSpOC support during Operation Pacific Shield." />
+  <title>MOB Common Operating Dashboard</title>
+
+  <style>
+    :root {
+      --bg: #0b1120;
+      --bg-2: #111827;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-2: #f8fafc;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #cbd5e1;
+      --blue: #2563eb;
+      --blue-dark: #1e3a8a;
+      --green: #059669;
+      --amber: #d97706;
+      --red: #dc2626;
+      --purple: #7c3aed;
+      --cyan: #0891b2;
+      --soft-blue: #eff6ff;
+      --soft-green: #ecfdf5;
+      --soft-amber: #fffbeb;
+      --soft-red: #fef2f2;
+      --soft-purple: #f5f3ff;
+      --shadow: 0 20px 40px rgba(2, 6, 23, 0.22);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(rgba(1, 2, 1, 0.90), rgba(1, 8, 1, 0.95)),
+        url("https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg") center center / cover fixed no-repeat,
+        radial-gradient(circle at 15% 0%, rgba(0, 255, 65, 0.09), transparent 30rem),
+        radial-gradient(circle at 85% 0%, rgba(102, 255, 153, 0.07), transparent 28rem),
+        linear-gradient(180deg, #010201 0, #031003 260px, #020402 100%);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    header {
+      color: #fff;
+      padding: 34px 18px 22px;
+    }
+
+    .hero {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.4fr 0.6fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .hero-main,
+    .hero-side {
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(15, 23, 42, 0.62);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      border-radius: 26px;
+      padding: 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.12);
+      color: #dbeafe;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    header h1 {
+      margin: 16px 0 8px;
+      font-size: clamp(2rem, 5vw, 4.2rem);
+      line-height: 1.05;
+      letter-spacing: -1px;
+    }
+
+    header p {
+      margin: 0;
+      max-width: 900px;
+      color: #d1d5db;
+      font-size: 1.08rem;
+    }
+
+    .hero-side h2 {
+      margin: 0 0 12px;
+      color: #fff;
+      font-size: 1.05rem;
+      border: 0;
+      padding: 0;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .ops-clock-panel {
+      max-width: 1280px;
+      margin: 16px auto 0;
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 14px;
+    }
+
+    .clock-card,
+    .reminder-card {
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(15, 23, 42, 0.72);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      border-radius: 22px;
+      padding: 18px;
+      color: #fff;
+    }
+
+    .clock-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .clock-tile {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 16px;
+      padding: 12px;
+      min-height: 86px;
+    }
+
+    .clock-tile span {
+      display: block;
+      color: #bfdbfe;
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .clock-tile strong {
+      display: block;
+      color: #fff;
+      font-size: clamp(1.15rem, 2.5vw, 1.9rem);
+      margin-top: 6px;
+      line-height: 1.1;
+    }
+
+    .clock-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .clock-controls button {
+      margin: 0;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+    }
+
+    .reminder-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .reminder-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 10px;
+      color: #e5e7eb;
+      font-size: 0.92rem;
+    }
+
+    .reminder-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      margin-top: 6px;
+      flex: 0 0 auto;
+      background: #60a5fa;
+      box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.14);
+    }
+
+    .reminder-dot.hot {
+      background: #f87171;
+      box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.16);
+    }
+
+    .reminder-dot.warn {
+      background: #fbbf24;
+      box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.16);
+    }
+
+    .metric {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .metric span {
+      display: block;
+      color: #bfdbfe;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      color: #fff;
+      font-size: 1.2rem;
+      margin-top: 3px;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.88);
+      border-top: 1px solid rgba(255, 255, 255, 0.6);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+
+    nav ul {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 10px 14px;
+      list-style: none;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--blue-dark);
+      font-weight: 900;
+      font-size: 0.86rem;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: #e0e7ff;
+      transition: 0.18s ease;
+    }
+
+    nav a:hover {
+      background: var(--blue);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 22px 14px 40px;
+    }
+
+    section {
+      scroll-margin-top: 82px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      opacity: 0.85;
+    }
+
+    h2 {
+      margin: 2px 0 12px;
+      color: #0f172a;
+      font-size: 1.18rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 9px;
+      letter-spacing: -0.2px;
+    }
+
+    h3 {
+      margin: 10px 0 8px;
+      color: var(--blue-dark);
+      font-size: 1rem;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .bluf {
+      background: linear-gradient(180deg, #ffffff, var(--soft-blue));
+    }
+
+    .success {
+      background: linear-gradient(180deg, #ffffff, var(--soft-green));
+    }
+
+    .warning {
+      background: linear-gradient(180deg, #ffffff, var(--soft-red));
+    }
+
+    .amber {
+      background: linear-gradient(180deg, #ffffff, var(--soft-amber));
+    }
+
+    .purple {
+      background: linear-gradient(180deg, #ffffff, var(--soft-purple));
+    }
+
+    .stat {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+    }
+
+    .stat label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      margin-bottom: 7px;
+    }
+
+    .tag-row {
+      margin-top: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: #e0e7ff;
+      color: var(--blue-dark);
+      font-size: 0.78rem;
+      font-weight: 900;
+      margin: 4px 5px 0 0;
+      border: 1px solid #c7d2fe;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 11px;
+      font: inherit;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+      transition: 0.15s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    label {
+      font-weight: 900;
+      font-size: 0.88rem;
+      color: #0f172a;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field small {
+      display: block;
+      color: var(--muted);
+      font-weight: 400;
+      margin-top: 3px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 13px;
+      padding: 10px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      background: var(--blue);
+      color: #fff;
+      margin: 4px 4px 4px 0;
+      transition: 0.16s ease;
+    }
+
+    button:hover {
+      filter: brightness(0.96);
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background: #334155;
+    }
+
+    button.green {
+      background: var(--green);
+    }
+
+    button.amber {
+      background: var(--amber);
+    }
+
+    button.red {
+      background: var(--red);
+    }
+
+    button.purple {
+      background: var(--purple);
+    }
+
+    button.cyan {
+      background: var(--cyan);
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .map-card {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .map-card h3 {
+      margin-top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .map-preview {
+      width: 100%;
+      min-height: 260px;
+      border: 2px dashed #94a3b8;
+      border-radius: 16px;
+      background: #f8fafc;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--muted);
+      text-align: center;
+      padding: 12px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .map-preview img {
+      width: 100%;
+      height: 100%;
+      max-height: 420px;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+    }
+
+    .map-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .zone-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .zone-buttons button {
+      margin: 0;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      background: #334155;
+    }
+
+    .marker-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #f8fafc;
+    }
+
+    .marker-controls .field {
+      margin-bottom: 0;
+    }
+
+    .marker-hint {
+      margin-top: 8px;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #eef2ff;
+      color: #1e3a8a;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .map-marker {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 0.78rem;
+      border: 3px solid #ffffff;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.45);
+      z-index: 8;
+      cursor: pointer;
+    }
+
+    .map-marker::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      opacity: 0.35;
+    }
+
+    .map-marker span {
+      color: #ffffff;
+      position: relative;
+      z-index: 2;
+    }
+
+    .marker-planning {
+      background: var(--blue);
+      color: var(--blue);
+    }
+
+    .marker-building {
+      background: var(--amber);
+      color: var(--amber);
+    }
+
+    .marker-operational {
+      background: var(--green);
+      color: var(--green);
+    }
+
+    .marker-risk {
+      background: var(--red);
+      color: var(--red);
+    }
+
+    .marker-abandoning {
+      background: #475569;
+      color: #475569;
+    }
+
+    .marker-table {
+      margin-top: 12px;
+    }
+
+    .map-note-box {
+      margin-top: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px;
+      font-size: 0.9rem;
+      color: #334155;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(2, 6, 23, 0.86);
+      padding: 24px;
+    }
+
+    .modal.active {
+      display: grid;
+      place-items: center;
+    }
+
+    .modal-content {
+      width: min(96vw, 1400px);
+      max-height: 92vh;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 20px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      overflow: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .modal-header h2 {
+      color: #ffffff;
+      margin: 0;
+      border: 0;
+      padding: 0;
+    }
+
+    .modal-map-wrap {
+      position: relative;
+      width: 100%;
+      background: #020617;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .modal-content img {
+      width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      background: #020617;
+      border-radius: 14px;
+      display: block;
+    }
+
+    .phase-card {
+      min-width: 150px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 13px;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .phase-card strong {
+      display: block;
+      color: #0f172a;
+      font-size: 0.98rem;
+    }
+
+    .phase-card span {
+      display: inline-block;
+      margin: 7px 0;
+      color: var(--blue-dark);
+      font-weight: 900;
+      font-size: 0.86rem;
+    }
+
+    .phase-card p {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .phase-exec {
+      border: 2px solid var(--red);
+      background: linear-gradient(180deg, #fff, #fff1f2);
+    }
+
+    .phase-plan {
+      border: 2px solid var(--blue);
+      background: linear-gradient(180deg, #fff, #eff6ff);
+    }
+
+    .phase-debrief {
+      border: 2px solid var(--green);
+      background: linear-gradient(180deg, #fff, #ecfdf5);
+    }
+
+    .checklist label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e7eb;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .checklist label:last-child {
+      border-bottom: none;
+    }
+
+    .checklist input {
+      width: auto;
+      margin-top: 3px;
+      transform: scale(1.12);
+      accent-color: var(--blue);
+    }
+
+    .checklist input:checked+span {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #e2e8f0;
+      color: #0f172a;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    td {
+      border-right: 1px solid #e5e7eb;
+    }
+
+    td:last-child,
+    th:last-child {
+      border-right: 0;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background: #eef2ff;
+    }
+
+    .report-box {
+      background: #0f172a;
+      color: #e5e7eb;
+      border-radius: 16px;
+      padding: 16px;
+      font-family: "Courier New", monospace;
+      font-size: 0.92rem;
+      white-space: pre-wrap;
+      min-height: 140px;
+      overflow-x: auto;
+      border: 1px solid #334155;
+    }
+
+    .fos-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background: #fff;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+    }
+
+    .fos-card h3 {
+      margin-top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 0.72rem;
+      white-space: nowrap;
+    }
+
+    .pill-green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .pill-amber {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .pill-red {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .pill-blue {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .sticky-actions {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 50;
+    }
+
+    .sticky-actions button {
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.25);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 0.86rem;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .ops-clock-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .clock-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline {
+        grid-template-columns: repeat(6, 180px);
+      }
+    }
+
+    @media (max-width: 760px) {
+      header {
+        padding: 22px 10px 16px;
+      }
+
+      .hero-main,
+      .hero-side {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      main {
+        padding: 14px 9px 30px;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .map-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .sticky-actions {
+        position: static;
+        margin: 0 10px 18px;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      nav ul {
+        padding: 9px;
+      }
+    }
+
+    /* Modern Common Operating Dashboard refresh */
+    :root {
+      --bg: #eef3f7;
+      --bg-2: #d8e2ea;
+      --panel: #ffffff;
+      --panel-2: #f7fafc;
+      --ink: #102033;
+      --muted: #46596d;
+      --line: #c9d5df;
+      --blue: #1d4ed8;
+      --blue-dark: #16345c;
+      --green: #047857;
+      --amber: #b45309;
+      --red: #b42318;
+      --purple: #5b21b6;
+      --cyan: #0e7490;
+      --soft-blue: #eaf3ff;
+      --soft-green: #eaf8f2;
+      --soft-amber: #fff6df;
+      --soft-red: #fff0ee;
+      --soft-purple: #f3edff;
+      --shadow: 0 18px 40px rgba(15, 32, 51, 0.14);
+      --radius: 14px;
+      --header-panel: rgba(10, 24, 40, 0.86);
+      --header-panel-strong: rgba(8, 20, 34, 0.94);
+      --header-text: #f8fafc;
+      --header-muted: #d8e6f0;
+      --focus: rgba(14, 116, 144, 0.22);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 15% 0%, rgba(14, 116, 144, 0.28), transparent 34rem),
+        radial-gradient(circle at 85% 0%, rgba(29, 78, 216, 0.24), transparent 32rem),
+        linear-gradient(180deg, #172536 0, #223449 310px, var(--bg) 310px, var(--bg) 100%);
+      color: var(--ink);
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      padding: 20px 18px 18px;
+    }
+
+    .hero {
+      grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+      gap: 14px;
+    }
+
+    .hero-main,
+    .hero-side,
+    .clock-card,
+    .reminder-card {
+      border-radius: var(--radius);
+      background: var(--header-panel);
+      border: 1px solid rgba(226, 232, 240, 0.18);
+      box-shadow: 0 20px 44px rgba(2, 8, 23, 0.26);
+      color: var(--header-text);
+    }
+
+    .hero-main,
+    .hero-side {
+      padding: 22px;
+    }
+
+    .hero-main {
+      display: flex;
+      min-height: 190px;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: rgba(14, 116, 144, 0.28);
+      border-color: rgba(125, 211, 252, 0.34);
+      color: #e0f7ff;
+      letter-spacing: 0.08em;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+    }
+
+    header h1 {
+      max-width: 830px;
+      margin: 14px 0 8px;
+      color: #ffffff;
+      font-size: clamp(2rem, 4.5vw, 3.7rem);
+      letter-spacing: -0.035em;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+    }
+
+    header p {
+      color: var(--header-muted);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .hero-side h2,
+    .clock-card h2,
+    .reminder-card h2 {
+      color: #ffffff;
+    }
+
+    .hero-metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .metric,
+    .clock-tile,
+    .reminder-item {
+      border-radius: 12px;
+      background: rgba(248, 250, 252, 0.11);
+      border: 1px solid rgba(226, 232, 240, 0.16);
+    }
+
+    .metric span,
+    .clock-tile span {
+      color: #cfe8f7;
+      letter-spacing: 0.08em;
+      font-weight: 900;
+    }
+
+    .metric strong,
+    .clock-tile strong {
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .metric strong {
+      font-size: 1.35rem;
+    }
+
+    .ops-clock-panel {
+      margin-top: 14px;
+      grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.75fr);
+      gap: 14px;
+    }
+
+    .clock-card,
+    .reminder-card {
+      padding: 17px;
+    }
+
+    .clock-grid {
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    }
+
+    .clock-tile {
+      min-height: 78px;
+      padding: 11px;
+    }
+
+    .clock-tile strong {
+      font-size: clamp(1.05rem, 1.6vw, 1.5rem);
+      letter-spacing: 0;
+    }
+
+    .reminder-list {
+      gap: 10px;
+    }
+
+    .reminder-item {
+      color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .reminder-item strong {
+      color: #ffffff;
+    }
+
+    nav {
+      margin: 0;
+      background: rgba(255, 255, 255, 0.96);
+      border-top: 0;
+      box-shadow: 0 8px 22px rgba(15, 32, 51, 0.08);
+    }
+
+    nav ul {
+      padding: 9px 14px;
+    }
+
+    nav a {
+      border-radius: 999px;
+      background: transparent;
+      color: #22384f;
+      font-size: 0.82rem;
+      padding: 8px 12px;
+    }
+
+    nav a:hover {
+      background: #e2edf5;
+      color: #102033;
+      transform: none;
+    }
+
+    main {
+      padding-top: 18px;
+    }
+
+    .card,
+    .stat,
+    .map-card,
+    .phase-card,
+    .fos-card,
+    .modal-content,
+    .report-box,
+    .table-wrap,
+    .map-preview,
+    .marker-controls,
+    .marker-hint,
+    .map-note-box {
+      border-radius: var(--radius);
+    }
+
+    .card {
+      background: var(--panel);
+      border-color: var(--line);
+      box-shadow: 0 12px 30px rgba(15, 32, 51, 0.08);
+      overflow: visible;
+    }
+
+    .card::before {
+      height: 0;
+    }
+
+    section.card,
+    section.grid-2,
+    section.grid {
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #dbe5ee;
+      color: #102033;
+      font-size: 1.03rem;
+      letter-spacing: 0;
+    }
+
+    h2::before {
+      content: "";
+      width: 7px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--cyan);
+      flex: 0 0 auto;
+    }
+
+    .hero-side h2::before,
+    .modal-header h2::before {
+      content: none;
+    }
+
+    h3 {
+      color: #16345c;
+    }
+
+    p,
+    li,
+    .small {
+      color: #26394d;
+    }
+
+    .muted,
+    .small.muted {
+      color: #52677b;
+    }
+
+    .bluf,
+    .success,
+    .warning,
+    .amber,
+    .purple {
+      background: #ffffff;
+    }
+
+    .grid,
+    .grid-2,
+    .grid-4 {
+      gap: 13px;
+    }
+
+    .stat,
+    .map-card,
+    .phase-card,
+    .fos-card {
+      border-color: #d7e1ea;
+      background: #fbfdff;
+      box-shadow: none;
+    }
+
+    .stat label,
+    label,
+    th,
+    .status-pill,
+    .tag {
+      letter-spacing: 0.04em;
+    }
+
+    .tag {
+      border-radius: 999px;
+      background: #eaf3f7;
+      border-color: #cfe0e8;
+      color: #16345c;
+    }
+
+    input,
+    select,
+    textarea {
+      border-radius: 10px;
+      border-color: #bfccd8;
+      background: #fbfdff;
+      color: #102033;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #687c8f;
+      opacity: 1;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px var(--focus);
+    }
+
+    button {
+      border-radius: 10px;
+      background: #24445d;
+      box-shadow: 0 2px 0 rgba(2, 8, 23, 0.16);
+    }
+
+    button:hover {
+      filter: brightness(1.03);
+      transform: translateY(-1px);
+    }
+
+    button:focus-visible,
+    nav a:focus-visible {
+      outline: 3px solid rgba(14, 116, 144, 0.35);
+      outline-offset: 2px;
+    }
+
+    button.green {
+      background: var(--green);
+    }
+
+    button.amber {
+      background: var(--amber);
+    }
+
+    button.red {
+      background: var(--red);
+    }
+
+    button.purple {
+      background: var(--purple);
+    }
+
+    button.cyan {
+      background: var(--cyan);
+    }
+
+    button.secondary {
+      background: #536272;
+    }
+
+    .phase-card {
+      border-width: 1px;
+    }
+
+    .phase-card strong,
+    .phase-card span,
+    .phase-card p {
+      color: #102033;
+    }
+
+    .phase-card span {
+      color: #16345c;
+    }
+
+    .phase-exec {
+      border-left: 6px solid var(--red);
+      background: #fffafa;
+    }
+
+    .phase-plan {
+      border-left: 6px solid var(--blue);
+      background: #f7fbff;
+    }
+
+    .phase-debrief {
+      border-left: 6px solid var(--green);
+      background: #f7fffb;
+    }
+
+    .map-preview {
+      border: 1px dashed #8195a8;
+      background:
+        linear-gradient(135deg, rgba(14, 116, 144, 0.08), transparent 42%),
+        #f8fbfd;
+      color: #445a70;
+      font-weight: 700;
+    }
+
+    .marker-hint {
+      background: #eaf3ff;
+      color: #16345c;
+      border: 1px solid #cfe0ff;
+    }
+
+    .map-note-box {
+      background: #f6f9fc;
+      color: #26394d;
+      border-color: #d7e1ea;
+      font-weight: 600;
+    }
+
+    th {
+      background: #e8eff5;
+      color: #26394d;
+    }
+
+    td {
+      color: #26394d;
+    }
+
+    tbody tr:hover {
+      background: #f1f8f8;
+    }
+
+    .report-box {
+      background: #111c2a;
+      border-color: #31465a;
+      color: #f8fafc;
+    }
+
+    .report-box,
+    .report-box * {
+      color: #f8fafc;
+    }
+
+    .modal-content {
+      background: #0b1320;
+      color: #f8fafc;
+    }
+
+    .modal-header h2 {
+      color: #f8fafc;
+    }
+
+    .status-pill {
+      border: 1px solid transparent;
+    }
+
+    .pill-green {
+      background: #d9f8eb;
+      color: #064e3b;
+      border-color: #a7f3d0;
+    }
+
+    .pill-amber {
+      background: #fff0c7;
+      color: #78350f;
+      border-color: #fcd34d;
+    }
+
+    .pill-red {
+      background: #ffe1df;
+      color: #7f1d1d;
+      border-color: #fca5a5;
+    }
+
+    .pill-blue {
+      background: #dcecff;
+      color: #1e3a8a;
+      border-color: #93c5fd;
+    }
+
+    .map-marker {
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    }
+
+    .sticky-actions {
+      right: 16px;
+      bottom: 16px;
+    }
+
+    .sticky-actions button {
+      min-width: 74px;
+      box-shadow: 0 10px 18px rgba(15, 32, 51, 0.18);
+    }
+
+    footer {
+      color: #52677b;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .ops-clock-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .clock-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      header {
+        padding: 18px 10px 14px;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .ops-clock-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-main,
+      .hero-side {
+        border-radius: var(--radius);
+        padding: 17px;
+      }
+
+      .clock-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-2,
+      .map-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sticky-actions {
+        position: static;
+        margin: 0 10px 18px;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+
+    /* Matrix Tactical Console Theme Override */
+    :root {
+      --bg: #020402;
+      --bg-2: #031a03;
+      --panel: #081108;
+      --panel-2: #0b160b;
+      --ink: #8dff9b;
+      --muted: #4ccf68;
+      --line: #1d5f2a;
+      --blue: #00ff41;
+      --blue-dark: #00cc33;
+      --green: #00ff41;
+      --amber: #7dff7d;
+      --red: #39ff14;
+      --purple: #00e65c;
+      --cyan: #66ff99;
+      --soft-blue: #081108;
+      --soft-green: #081108;
+      --soft-amber: #0a140a;
+      --soft-red: #081108;
+      --soft-purple: #081108;
+      --shadow: 0 0 18px rgba(0, 255, 65, 0.18);
+      --radius: 10px;
+      --header-panel: rgba(0, 15, 0, 0.92);
+      --header-panel-strong: rgba(0, 10, 0, 0.98);
+      --header-text: #b7ffbf;
+      --header-muted: #72ff8f;
+      --focus: rgba(0, 255, 65, 0.22);
+    }
+
+    body {
+      font-family: "Courier New", Consolas, monospace;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(0, 255, 65, 0.08), transparent 30rem),
+        radial-gradient(circle at 85% 0%, rgba(102, 255, 153, 0.06), transparent 28rem),
+        linear-gradient(180deg, #010201 0, #031003 260px, #020402 100%);
+      color: #8dff9b;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(to bottom,
+          rgba(0, 255, 65, 0.015),
+          rgba(0, 255, 65, 0.015) 1px,
+          transparent 1px,
+          transparent 3px);
+      z-index: 9999;
+    }
+
+    header h1 {
+      text-transform: uppercase;
+      color: #b7ffbf;
+      text-shadow: 0 0 10px rgba(0, 255, 65, 0.45);
+    }
+
+    header p,
+    .hero-side h2,
+    .clock-card h2,
+    .reminder-card h2,
+    .metric strong,
+    .clock-tile strong {
+      color: #b7ffbf;
+    }
+
+    .hero-main,
+    .hero-side,
+    .clock-card,
+    .reminder-card {
+      background: rgba(0, 12, 0, 0.94);
+      border-color: #1d5f2a;
+      box-shadow: 0 0 18px rgba(0, 255, 65, 0.16);
+    }
+
+    .eyebrow,
+    .metric,
+    .clock-tile,
+    .reminder-item {
+      background: rgba(0, 255, 65, 0.07);
+      border-color: #1d5f2a;
+      color: #b7ffbf;
+    }
+
+    .metric span,
+    .clock-tile span,
+    .reminder-item,
+    .reminder-item strong {
+      color: #72ff8f;
+    }
+
+    nav {
+      background: rgba(0, 10, 0, 0.96);
+      border-color: #1d5f2a;
+      box-shadow: 0 0 16px rgba(0, 255, 65, 0.12);
+    }
+
+    nav a {
+      background: transparent;
+      color: #72ff8f;
+      border: 1px solid transparent;
+    }
+
+    nav a:hover {
+      background: #00ff41;
+      color: #001500;
+      border-color: #00ff41;
+      box-shadow: 0 0 12px rgba(0, 255, 65, 0.28);
+    }
+
+    .card,
+    .bluf,
+    .success,
+    .warning,
+    .amber,
+    .purple {
+      background: #061006;
+      border-color: #1d5f2a;
+      box-shadow: 0 0 12px rgba(0, 255, 65, 0.08);
+    }
+
+    .stat,
+    .map-card,
+    .phase-card,
+    .fos-card {
+      background: #081108;
+      border-color: #1d5f2a;
+      box-shadow: 0 0 8px rgba(0, 255, 65, 0.08);
+    }
+
+    h2,
+    h3,
+    label,
+    .stat label,
+    p,
+    li,
+    .small,
+    .muted,
+    .small.muted,
+    .field small,
+    .tag,
+    .status-pill,
+    th,
+    td {
+      color: #8dff9b;
+    }
+
+    h2,
+    h3 {
+      text-shadow: 0 0 7px rgba(0, 255, 65, 0.20);
+    }
+
+    h2 {
+      border-bottom-color: #1d5f2a;
+    }
+
+    h2::before {
+      background: #00ff41;
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.45);
+    }
+
+    .tag,
+    .pill-green,
+    .pill-amber,
+    .pill-red,
+    .pill-blue {
+      background: #0b1f0b;
+      color: #b7ffbf;
+      border-color: #1d5f2a;
+    }
+
+    input,
+    select,
+    textarea {
+      background: #031003;
+      color: #8dff9b;
+      border-color: #1d5f2a;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #4ccf68;
+      opacity: 1;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #00ff41;
+      box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.18), 0 0 12px rgba(0, 255, 65, 0.16);
+    }
+
+    button,
+    button.green,
+    button.amber,
+    button.red,
+    button.purple,
+    button.cyan,
+    button.secondary {
+      background: #00cc33;
+      color: #001500;
+      border: 1px solid #00ff41;
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.18);
+    }
+
+    button:hover,
+    button.green:hover,
+    button.amber:hover,
+    button.red:hover,
+    button.purple:hover,
+    button.cyan:hover,
+    button.secondary:hover {
+      background: #00ff41;
+      color: #001500;
+      box-shadow: 0 0 14px rgba(0, 255, 65, 0.35);
+      filter: none;
+    }
+
+    .map-preview,
+    .marker-controls,
+    .marker-hint,
+    .map-note-box,
+    .table-wrap {
+      background: #071207;
+      border-color: #1d5f2a;
+      color: #8dff9b;
+      box-shadow: 0 0 8px rgba(0, 255, 65, 0.08);
+    }
+
+    .map-preview span,
+    .map-note-box,
+    .marker-hint {
+      color: #8dff9b;
+    }
+
+    table {
+      background: #061006;
+      color: #8dff9b;
+    }
+
+    th {
+      background: #0b1f0b;
+      color: #b7ffbf;
+      border-color: #1d5f2a;
+    }
+
+    td {
+      background: #061006;
+      color: #8dff9b;
+      border-color: #1d5f2a;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #071207;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: #071207;
+    }
+
+    tbody tr:hover,
+    tbody tr:hover td {
+      background: #0d2d0d;
+    }
+
+    .phase-card strong,
+    .phase-card span,
+    .phase-card p {
+      color: #8dff9b;
+    }
+
+    .phase-exec,
+    .phase-plan,
+    .phase-debrief {
+      background: #081108;
+      border-color: #1d5f2a;
+      border-left-color: #00ff41;
+    }
+
+    .report-box,
+    .report-box *,
+    .modal-content,
+    .modal-header h2 {
+      background: #010801;
+      color: #b7ffbf;
+      border-color: #1d5f2a;
+    }
+
+    .modal-content {
+      box-shadow: 0 0 28px rgba(0, 255, 65, 0.24);
+    }
+
+    .modal-map-wrap {
+      background: #010801;
+      border: 1px solid #1d5f2a;
+    }
+
+    .checklist label {
+      color: #8dff9b;
+      border-bottom-color: #1d5f2a;
+    }
+
+    .checklist input:checked+span {
+      color: #4ccf68;
+    }
+
+    .map-marker {
+      border-color: #b7ffbf;
+      box-shadow: 0 0 16px rgba(0, 255, 65, 0.45);
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
+    }
+
+    .marker-planning,
+    .marker-building,
+    .marker-operational,
+    .marker-risk,
+    .marker-abandoning {
+      background: #00cc33;
+      color: #00ff41;
+    }
+
+    footer {
+      color: #72ff8f;
+    }
+
+    @media print {
+
+      nav,
+      .sticky-actions,
+      button {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+        color: #000;
+      }
+
+      header {
+        background: #111827 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      main {
+        max-width: 100%;
+        padding: 10px;
+      }
+
+      .card,
+      .fos-card,
+      .stat,
+      .phase-card {
+        box-shadow: none;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      input,
+      select,
+      textarea {
+        border: 1px solid #999;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="hero">
+      <div class="hero-main">
+        <div class="eyebrow">Operation Pacific Shield | MOB Common Operating Dashboard</div>
+        <h1>MOB Common Operating Dashboard</h1>
+        <p>One shared operating picture for MOB LNOs: CSpOC updates, mission timing, FOS status, threats,
+          space effects, commander updates, and decision logs in a single workspace.</p>
+      </div>
+      <div class="hero-side">
+        <h2>Operations Snapshot</h2>
+        <div class="hero-metrics">
+          <div class="metric"><span>MOBs</span><strong>4 tracked</strong></div>
+          <div class="metric"><span>Looks</span><strong>8 x 10</strong></div>
+          <div class="metric"><span>Execution</span><strong>2-3 / 7-8</strong></div>
+          <div class="metric"><span>Cycle</span><strong>145 min</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ops-clock-panel" aria-label="Operation clock and reminders">
+      <div class="clock-card">
+        <div class="eyebrow">Live Mission Clock</div>
+        <div class="clock-grid">
+          <div class="clock-tile">
+            <span>Local Time</span>
+            <strong id="localTimeDisplay">--:--:--</strong>
+          </div>
+          <div class="clock-tile">
+            <span>Zulu (UTC)</span>
+            <strong id="zuluTimeDisplay">--:--:--</strong>
+          </div>
+          <div class="clock-tile">
+            <span>Washington DC</span>
+            <strong id="dcTimeDisplay">--:--:--</strong>
+          </div>
+          <div class="clock-tile">
+            <span>Japan (JST)</span>
+            <strong id="jpnTimeDisplay">--:--:--</strong>
+          </div>
+          <div class="clock-tile">
+            <span>Guam (ChST)</span>
+            <strong id="guamTimeDisplay">--:--:--</strong>
+          </div>
+          <div class="clock-tile">
+            <span>Hickam HI (HST)</span>
+            <strong id="hickamTimeDisplay">--:--:--</strong>
+          </div>
+          <div class="clock-tile">
+            <span>Mission Elapsed</span>
+            <strong id="missionElapsedDisplay">00:00:00</strong>
+          </div>
+          <div class="clock-tile">
+            <span>Current Segment</span>
+            <strong id="segmentDisplay">Not Started</strong>
+          </div>
+        </div>
+        <div class="clock-controls">
+          <button onclick="startMissionClock()" class="green">Start Clock</button>
+          <button onclick="pauseMissionClock()" class="amber">Pause</button>
+          <button onclick="resetMissionClock()" class="red">Reset Clock</button>
+          <button onclick="markCurrentLook()" class="cyan">Sync Look Dropdown</button>
+        </div>
+      </div>
+
+      <div class="reminder-card">
+        <div class="eyebrow">Decision Prompts</div>
+        <div id="primaryReminder" class="reminder-list">
+          <div class="reminder-item">
+            <span class="reminder-dot"></span>
+            <span>Start the clock at the beginning of the 45-minute Mission Planning + Pre-Brief
+              window.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Guide navigation">
+    <ul>
+      <li><a href="#dashboard">COP</a></li>
+      <li><a href="#timeline">Timeline</a></li>
+      <li><a href="#maps">Maps</a></li>
+      <li><a href="#turn">Checklist</a></li>
+      <li><a href="#fos">FOS Tracker</a></li>
+      <li><a href="#threats">Threats</a></li>
+      <li><a href="#space">Space Effects</a></li>
+      <li><a href="#reports">Reports</a></li>
+      <li><a href="#log">Log</a></li>
+      <li><a href="#quickref">Quick Ref</a></li>
+    </ul>
+  </nav>
+
+  <div class="sticky-actions">
+    <button onclick="saveAll()" class="green">Save</button>
+    <button onclick="window.print()" class="secondary">Print</button>
+    <button onclick="resetAll()" class="red">Reset</button>
+  </div>
+
+  <main>
+    <section id="dashboard" class="card bluf">
+      <h2>1. Common Operating Picture</h2>
+      <p><strong>Mission:</strong> Maintain a unified MOB picture by translating CSpOC findings into actionable
+        guidance for FOS posture, fighter generation, mobility routing, space support, and survivability.</p>
+      <div class="grid-4">
+        <div class="stat">
+          <label for="mobBase">Assigned MOB Base</label>
+          <select id="mobBase">
+            <option value="Kadena AB, Japan | Hex 407">Kadena AB, Japan | Hex 407</option>
+            <option value="Yokota AB, Japan | Hex 209">Yokota AB, Japan | Hex 209</option>
+            <option value="Andersen AFB, Guam | Hex 609">Andersen AFB, Guam | Hex 609</option>
+            <option value="Osan AB, South Korea | Hex 107">Osan AB, South Korea | Hex 107</option>
+          </select>
+        </div>
+        <div class="stat">
+          <label for="gameTurn">Game Turn</label>
+          <input id="gameTurn" type="number" min="1" placeholder="Ex: 1" />
+        </div>
+        <div class="stat">
+          <label for="phase">Phase</label>
+          <select id="phase">
+            <option value="Crisis">Crisis</option>
+            <option value="Conflict">Conflict</option>
+          </select>
+        </div>
+        <div class="stat">
+          <label for="commStatus">MOB COMM</label>
+          <select id="commStatus">
+            <option value="Operational">Operational</option>
+            <option value="Voice Denied">Voice Denied</option>
+            <option value="Data Denied">Data Denied</option>
+            <option value="COMM Denied">COMM Denied</option>
+          </select>
+        </div>
+        <div class="stat">
+          <label for="currentLook">Current Look</label>
+          <select id="currentLook">
+            <option>Planning / Pre-Brief</option>
+            <option>Look 1</option>
+            <option>Look 2 - Execution Window</option>
+            <option>Look 3 - Execution Window</option>
+            <option>Look 4</option>
+            <option>Look 5</option>
+            <option>Look 6</option>
+            <option>Look 7 - Execution Window</option>
+            <option>Look 8 - Execution Window</option>
+            <option>Debrief</option>
+          </select>
+        </div>
+        <div class="stat">
+          <label for="priority">MOB Priority</label>
+          <select id="priority">
+            <option value="FOS Establishment">FOS Establishment</option>
+            <option value="Fighter Generation">Fighter Generation</option>
+            <option value="Mobility / Sustainment">Mobility / Sustainment</option>
+            <option value="Force Protection">Force Protection</option>
+            <option value="Strike Support">Strike Support</option>
+          </select>
+        </div>
+      </div>
+      <div class="tag-row">
+        <div class="tag">Common Operating Picture</div>
+        <div class="tag">4 MOB / FOS Nodes</div>
+        <div class="tag">8 Operational Looks</div>
+        <div class="tag">CSpOC Bridge</div>
+        <div class="tag">Execution Windows: Looks 2-3 &amp; 7-8</div>
+      </div>
+    </section>
+
+    <section id="timeline" class="card purple">
+      <h2>2. Mission Timeline &amp; Operating Flow</h2>
+      <div class="timeline">
+        <div class="phase-card phase-plan">
+          <strong>Planning + Pre-Brief</strong>
+          <span>45 min</span>
+          <p>Base selection, FOS plan, ISR priorities, initial coordination.</p>
+        </div>
+        <div class="phase-card">
+          <strong>Look 1</strong>
+          <span>10 min</span>
+          <p>Initial space and threat assessment.</p>
+        </div>
+        <div class="phase-card phase-exec">
+          <strong>Looks 2-3</strong>
+          <span>20 min</span>
+          <p>Execution Window #1. Push rapid recommendations.</p>
+        </div>
+        <div class="phase-card">
+          <strong>Looks 4-6</strong>
+          <span>30 min</span>
+          <p>Reassess, sustain, reposition, and adapt.</p>
+        </div>
+        <div class="phase-card phase-exec">
+          <strong>Looks 7-8</strong>
+          <span>20 min</span>
+          <p>Execution Window #2. Final decisive actions.</p>
+        </div>
+        <div class="phase-card phase-debrief">
+          <strong>Debrief</strong>
+          <span>20 min</span>
+          <p>Capture lessons, results, and evaluation points.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="maps" class="card">
+      <h2>3. Operational Maps &amp; MOB Reference</h2>
+      <p class="small muted">Upload your CSpOC GEO map and theater map once. The images are saved in this browser
+        for quick reference during mission planning and execution.</p>
+
+      <div class="map-grid">
+        <div class="map-card">
+          <h3>Strategic GEO / CSpOC Map <span class="status-pill pill-blue">Space / Orbital View</span></h3>
+          <p class="small muted">Track GEO Zones 1–5, orbital transitions, satellite placement, ISR/SDA
+            opportunities, COMM coverage, GPS modifiers, and space threat awareness impacting Pacific Shield
+            operations.</p>
+          <div id="geoMapPreview" class="map-preview" onclick="openMapModal('geo')">
+            <span>Upload GEO Zone / CSpOC orbital map image for satellite, ISR, COMM, GPS, and threat
+              tracking</span>
+          </div>
+          <div class="map-actions">
+            <input id="geoMapInput" type="file" accept="image/*" onchange="handleMapUpload(event, 'geo')" />
+            <button onclick="openMapModal('geo')" class="cyan">Open Large</button>
+            <button onclick="clearMap('geo')" class="secondary">Clear Map</button>
+          </div>
+          <div class="zone-buttons" aria-label="GEO zone quick notes">
+            <button
+              onclick="setMapNote('GEO Zone 1: Western Pacific / East Asia. Primary satellites include L1-L4, M1-1/2, M2-1/2/3, M3-1/2, and M4-1/2/4. Highest priority zone for Kadena, Yokota, Osan, Andersen, Taiwan, and Pacific Shield strike operations. Focus ISR, GPS, COMM, and jammer monitoring here.')">GEO
+              1</button>
+            <button
+              onclick="setMapNote('GEO Zone 2: Southeast Asia / Indian Ocean. Key satellites include M1-5/6/7, M2-5/6/7, M3-4/5, M4-4/5/6, and G2. Supports Southeast Asia, South China Sea, logistics, sustainment, and alternate strike routing.')">GEO
+              2</button>
+            <button
+              onclick="setMapNote('GEO Zone 3: Central CSpOC / Europe-Africa bridge. Key satellites include L8-L13, M1-8/9/10, M2-8/10/11, M3-6/7/8/9/10, M4-7/8/9, and G3. Core zone for orbital awareness, ISR transition, SDA, missile warning, and global space control.')">GEO
+              3</button>
+            <button
+              onclick="setMapNote('GEO Zone 4: Atlantic / Americas sustainment bridge. Key satellites include L14/L15, M1-11/12/13, M2-12/13/14, M3-11/12, M4-11/12, and G4. Supports rear sustainment, CONUS reinforcement, and follow-on orbital transitions.')">GEO
+              4</button>
+            <button
+              onclick="setMapNote('GEO Zone 5: Pacific / Western Hemisphere return path. Key satellites include L16/L18/L19, M2-15/16/17, M3-14/15, M4-13/14/15, and G5. Important for Pacific continuity, reinforcement timing, and broader orbital tracking.')">GEO
+              5</button>
+          </div>
+          <div class="field" style="margin-top:14px;">
+            <label for="geoTurnNotes">GEO / CSpOC Turn-by-Turn Notes</label>
+            <textarea id="geoTurnNotes">Turn 1:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 2:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 3:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 4:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 5:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 6:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 7:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 8:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:</textarea>
+            <small>Use this running GEO log to track satellite movement, orbital threats, COMM/GPS opportunities, and
+              CSpOC recommendations each turn.</small>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <h3>Theater / Main Game Board <span class="status-pill pill-amber">MOB-FOS View</span></h3>
+          <div id="theaterMapPreview" class="map-preview" onclick="handleTheaterMapClick(event)">
+            <span>Upload theater / main game board image</span>
+          </div>
+          <div class="marker-controls" aria-label="FOS marker controls">
+            <div class="field">
+              <label for="markerLabel">Marker</label>
+              <select id="markerLabel">
+                <option value="Kadena AB | Hex 407">Kadena AB | Hex 407</option>
+                <option value="Yokota AB | Hex 209">Yokota AB | Hex 209</option>
+                <option value="Andersen AFB | Hex 609">Andersen AFB | Hex 609</option>
+                <option value="Osan AB | Hex 107">Osan AB | Hex 107</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="markerStatus">Status</label>
+              <select id="markerStatus">
+                <option value="Planning">Planning</option>
+                <option value="Building">Building</option>
+                <option value="Operational">Operational</option>
+                <option value="At Risk">At Risk</option>
+                <option value="Abandoning">Abandoning</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="markerNote">Hex / Note</label>
+              <input id="markerNote" placeholder="Ex: MOB/FOS location, threat note, or support requirement" />
+            </div>
+          </div>
+          <div class="marker-hint">Click directly on the uploaded theater map to place or move the selected
+            FOS marker.</div>
+          <div class="map-actions">
+            <input id="theaterMapInput" type="file" accept="image/*" onchange="handleMapUpload(event, 'theater')" />
+            <button onclick="openMapModal('theater')" class="cyan">Open Large</button>
+            <button onclick="loadCorrectFosMarkers()" class="green">Load Correct FOS</button>
+            <button onclick="clearTheaterMarkers()" class="red">Clear Markers</button>
+            <button onclick="clearMap('theater')" class="secondary">Clear Map</button>
+          </div>
+          <div class="table-wrap marker-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Marker</th>
+                  <th>Status</th>
+                  <th>Hex / Note</th>
+                  <th>Position</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="markerTable"></tbody>
+            </table>
+          </div>
+          <div class="zone-buttons" aria-label="MOB quick notes">
+            <button
+              onclick="setMapNote('Kadena AB | Hex 407: Forward Japan/Okinawa MOB/FOS location. Prioritize fighter generation, Taiwan/South China Sea reach, D-26 proximity, jammer threats, and COMM/GPS support.')">Kadena</button>
+            <button
+              onclick="setMapNote('Yokota AB | Hex 209: Japan mobility/C2 hub. Prioritize sustainment flow, routing, COMM continuity, and support to Kadena/Misawa/Korea operations.')">Yokota</button>
+            <button
+              onclick="setMapNote('Andersen AFB | Hex 609: Guam MOB/FOS location. Prioritize survivability, long-range sustainment, fighter generation, and D-26 line awareness.')">Andersen</button>
+            <button
+              onclick="setMapNote('Osan AB | Hex 107: Korea MOB/FOS location. Prioritize survivability, North Korea/China proximity, access constraints, and route protection.')">Osan</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-note-box" id="mapNoteBox">
+        Select a GEO zone or MOB/FOS button to display operational planning notes, satellite coverage, and
+        priority considerations here.
+      </div>
+    </section>
+
+    <div id="mapModal" class="modal" onclick="closeMapModal(event)">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="mapModalTitle">Operational Map</h2>
+          <button onclick="closeMapModal(event)" class="red">Close</button>
+        </div>
+        <div id="modalMapWrap" class="modal-map-wrap">
+          <img id="mapModalImage" alt="Expanded operational map" />
+        </div>
+      </div>
+    </div>
+
+    <section id="turn" class="grid-2">
+      <div class="card success">
+        <h2>4. Turn-by-Turn LNO Checklist</h2>
+        <div class="checklist">
+          <label><input type="checkbox" class="persist" id="chk1" /><span>Confirm assigned MOB commander’s
+              current priority.</span></label>
+          <label><input type="checkbox" class="persist" id="chk2" /><span>Check CSpOC ISR for 12/20-strength
+              enemy fighters.</span></label>
+          <label><input type="checkbox" class="persist" id="chk3" /><span>Check SDA for satellite jammers or
+              PRC satellites.</span></label>
+          <label><input type="checkbox" class="persist" id="chk4" /><span>Check airborne jammer locations near
+              FOSs or planned routes.</span></label>
+          <label><input type="checkbox" class="persist" id="chk5" /><span>Confirm COMM status: MOB, CAOC,
+              FOSs, and LNO channels.</span></label>
+          <label><input type="checkbox" class="persist" id="chk6" /><span>Identify GPS +1 modifier
+              opportunities for planned strike hexes.</span></label>
+          <label><input type="checkbox" class="persist" id="chk7" /><span>Identify cyber support opportunity
+              and timing before execution.</span></label>
+          <label><input type="checkbox" class="persist" id="chk8" /><span>Check weather impacts for sortie,
+              mobility, or FOS operations.</span></label>
+          <label><input type="checkbox" class="persist" id="chk9" /><span>Push Threat-Impact-Recommendation
+              update to MOB Commander.</span></label>
+          <label><input type="checkbox" class="persist" id="chk10" /><span>Send MOB requirements back to
+              CSpOC.</span></label>
+        </div>
+        <button onclick="clearChecklist()" class="secondary">Clear Checklist Only</button>
+      </div>
+
+      <div class="card amber">
+        <h2>5. Current LNO Notes</h2>
+        <div class="field">
+          <label for="commanderIntent">Commander Intent / Priority</label>
+          <textarea id="commanderIntent"
+            placeholder="Example: Establish FOS 3, preserve fighters, avoid jammer near Hex ___."></textarea>
+        </div>
+        <div class="field">
+          <label for="cspocRequest">Request to CSpOC</label>
+          <textarea id="cspocRequest"
+            placeholder="Example: Need ISR look on Hex ___ and GPS support for planned sortie."></textarea>
+        </div>
+        <div class="field">
+          <label for="mobUpdate">Update to MOB Commander</label>
+          <textarea id="mobUpdate"
+            placeholder="Example: Threat identified near route. Recommend reroute or escort."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section id="fos" class="card">
+      <h2>6. MOB / FOS Status Board</h2>
+      <p class="small muted">Track the four board-based MOB/FOS locations visible on the theater map: Kadena AB,
+        Yokota AB, Andersen AFB, and Osan AB.</p>
+      <div class="grid" id="fosGrid"></div>
+    </section>
+
+    <section id="threats" class="grid-2">
+      <div class="card warning">
+        <h2>7. Threat Tracker</h2>
+        <div class="grid">
+          <div class="field">
+            <label for="threatType">Threat Type</label>
+            <select id="threatType">
+              <option>12-strength Fighter</option>
+              <option>20-strength Fighter</option>
+              <option>Airborne Jammer</option>
+              <option>Satellite Jammer</option>
+              <option>10-based SAM / Missile Threat</option>
+              <option>PRC Dual-Use Satellite</option>
+              <option>Weather Impact</option>
+              <option>COMM / Data Denial</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="threatLocation">Location</label>
+            <input id="threatLocation" placeholder="Hex, FOS, orbit, or zone" />
+          </div>
+          <div class="field">
+            <label for="threatImpact">Impact</label>
+            <input id="threatImpact" placeholder="What this does to MOB operations" />
+          </div>
+          <div class="field">
+            <label for="threatRecommendation">Recommendation</label>
+            <input id="threatRecommendation" placeholder="Delay, reroute, strike, GPS, cyber, COMM support" />
+          </div>
+        </div>
+        <button onclick="addThreat()" class="red">Add Threat</button>
+        <button onclick="clearThreats()" class="secondary">Clear Threats</button>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Impact</th>
+                <th>Recommendation</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="threatTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card purple">
+        <h2>8. High-Priority Watch Items</h2>
+        <ul>
+          <li><strong>Satellite jammer within 2 hexes:</strong> request SDA confirmation and Orbital Warfare
+            option.</li>
+          <li><strong>Airborne jammer near strike route:</strong> recommend cyber/GPS support or delay sortie.
+          </li>
+          <li><strong>Enemy fighters near mobility route:</strong> recommend escort, reroute, or alternate
+            FOS.</li>
+          <li><strong>COMM/Data denial:</strong> shift to verbal backup and request COMM satellite coverage.
+          </li>
+          <li><strong>Missile threat:</strong> advise dispersion, missile defense, hardening, or FOS
+            transition.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="space" class="card success">
+      <h2>9. Space Effects Request Builder</h2>
+      <div class="grid">
+        <div class="field">
+          <label for="spaceEffect">Requested Effect</label>
+          <select id="spaceEffect">
+            <option>ISR Look</option>
+            <option>SDA Look</option>
+            <option>COMM Coverage</option>
+            <option>GPS +1 Modifier</option>
+            <option>Cyber +1 Modifier</option>
+            <option>Weather Update</option>
+            <option>Missile Warning</option>
+            <option>Orbital Warfare</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="spaceLocation">Target Location</label>
+          <input id="spaceLocation" placeholder="Hex / FOS / GEO zone / orbit" />
+        </div>
+        <div class="field">
+          <label for="spacePurpose">Purpose</label>
+          <input id="spacePurpose" placeholder="Why the MOB needs this effect" />
+        </div>
+        <div class="field">
+          <label for="spaceTiming">Timing</label>
+          <input id="spaceTiming" placeholder="Look, turn, execution window, or before ATO" />
+        </div>
+      </div>
+      <button onclick="addSpaceRequest()" class="green">Add Space Request</button>
+      <button onclick="clearSpaceRequests()" class="secondary">Clear Requests</button>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Effect</th>
+              <th>Location</th>
+              <th>Purpose</th>
+              <th>Timing</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="spaceTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="reports" class="grid-2">
+      <div class="card">
+        <h2>10. LNO Report Builder</h2>
+        <div class="field">
+          <label for="reportThreat">Threat / Change</label>
+          <input id="reportThreat" placeholder="Example: PRC airborne jammer identified near FOS 3" />
+        </div>
+        <div class="field">
+          <label for="reportImpact">Impact to MOB</label>
+          <input id="reportImpact" placeholder="Example: May degrade sortie success and mobility routing" />
+        </div>
+        <div class="field">
+          <label for="reportRec">Recommendation</label>
+          <input id="reportRec" placeholder="Example: Delay sortie until GPS/cyber support or reroute" />
+        </div>
+        <button onclick="buildReport()">Build Report</button>
+        <button onclick="copyReport()" class="secondary">Copy Report</button>
+      </div>
+      <div class="card">
+        <h2>Generated Report</h2>
+        <div id="generatedReport" class="report-box">THREAT:
+          IMPACT:
+          RECOMMENDATION: </div>
+      </div>
+    </section>
+
+    <section id="log" class="card">
+      <h2>11. Decision / Update Log</h2>
+      <div class="grid">
+        <div class="field">
+          <label for="logTime">Time / Turn / Look</label>
+          <input id="logTime" placeholder="Look 2 / Turn 1 / 00:55 / etc." />
+        </div>
+        <div class="field">
+          <label for="logEntry">Entry</label>
+          <input id="logEntry" placeholder="What changed, who was informed, and what action was recommended" />
+        </div>
+      </div>
+      <button onclick="addLog()" class="purple">Add Log Entry</button>
+      <button onclick="clearLog()" class="secondary">Clear Log</button>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time / Turn / Look</th>
+              <th>Entry</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="logTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="quickref" class="grid-2">
+      <div class="card bluf">
+        <h2>12. MOB LNO Operating Reminders</h2>
+        <ul>
+          <li><strong>Your value is speed.</strong> Report early enough to shape ATO, FOS, and strike
+            decisions.</li>
+          <li><strong>Use Threat-Impact-Recommendation.</strong> Do not just pass raw CSpOC data.</li>
+          <li><strong>Think one look ahead.</strong> Satellite movement and denied communications matter
+            before execution.</li>
+          <li><strong>Protect the decision cycle.</strong> The MOB commander needs concise, relevant,
+            actionable updates.</li>
+          <li><strong>Execution windows matter most.</strong> Be ready before Looks 2-3 and 7-8.</li>
+        </ul>
+      </div>
+
+      <div class="card amber">
+        <h2>13. Quick Verbal Phrases</h2>
+        <div class="report-box">“MOB, CSpOC update: [threat] located at [location]. Impact is [impact].
+          Recommend [action].”
+
+          “CSpOC, MOB request: need [space effect] over [location] by [look/turn/time] to support [mission].”
+
+          “Commander, this affects [FOS/fighter/mobility/COMM]. My recommendation is [action] because
+          [reason].”</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    MOB Common Operating Dashboard | Operation Pacific Shield | CSpOC Support Role
+  </footer>
+
+  <script>
+    const STORAGE_KEY = "mobLnoOpsTool_v2";
+    const CLOCK_KEY = "mobLnoMissionClock_v1";
+
+    const missionSegments = [
+      { name: "Planning / Pre-Brief", start: 0, end: 45, reminder: "Build the plan: confirm assigned MOB, FOS intent, ISR priorities, COMM plan, and CSpOC support requests." },
+      { name: "Look 1", start: 45, end: 55, reminder: "Initial look: collect first threat picture and push only critical changes to the MOB Commander." },
+      { name: "Look 2 - Execution Window", start: 55, end: 65, hot: true, reminder: "EXECUTION WINDOW #1: be ready to pass Threat-Impact-Recommendation updates immediately." },
+      { name: "Look 3 - Execution Window", start: 65, end: 75, hot: true, reminder: "EXECUTION WINDOW #1 continues: confirm GPS, cyber, jammer, and route impacts before decisions lock." },
+      { name: "Look 4", start: 75, end: 85, reminder: "Reassess: update FOS risk, threat trends, COMM degradation, and follow-on requests to CSpOC." },
+      { name: "Look 5", start: 85, end: 95, reminder: "Sustain: check mobility routing, jammers, weather, and whether the MOB needs revised space effects." },
+      { name: "Look 6", start: 95, end: 105, warn: true, reminder: "Prepare for final execution window: pre-stage recommended actions for Looks 7-8." },
+      { name: "Look 7 - Execution Window", start: 105, end: 115, hot: true, reminder: "EXECUTION WINDOW #2: push final threat, jammer, GPS/cyber, and COMM recommendations." },
+      { name: "Look 8 - Execution Window", start: 115, end: 125, hot: true, reminder: "FINAL EXECUTION: capture decisions and prepare debrief notes while maintaining real-time updates." },
+      { name: "Debrief", start: 125, end: 145, reminder: "Debrief: summarize what changed, what you recommended, what was decided, and the operational effect." }
+    ];
+
+    let missionClock = {
+      startTimestamp: null,
+      accumulatedMs: 0,
+      running: false
+    };
+
+    let clockInterval = null;
+
+    const fosNames = [
+      "Kadena AB | Hex 407",
+      "Yokota AB | Hex 209",
+      "Andersen AFB | Hex 609",
+      "Osan AB | Hex 107"
+    ];
+
+    const fosDetails = {
+      "Kadena AB | Hex 407": {
+        role: "Forward Japan/Okinawa MOB/FOS",
+        focus: "Fighter generation, Taiwan/South China Sea reach, D-26 proximity, jammer threats, and COMM/GPS support.",
+        watch: "Watch airborne jammers, satellite jammers, PRC fighter proximity, weather impacts, and strike-route timing."
+      },
+      "Yokota AB | Hex 209": {
+        role: "Japan mobility / C2 support hub",
+        focus: "Sustainment flow, routing, COMM continuity, and support to Kadena, Misawa, and Korea operations.",
+        watch: "Watch logistics routes, COMM degradation, overflight access, and support requirements from forward FOSs."
+      },
+      "Andersen AFB | Hex 609": {
+        role: "Guam MOB/FOS sustainment hub",
+        focus: "Survivability, long-range sustainment, fighter generation, and D-26 line awareness.",
+        watch: "Watch missile threats, mobility routing, fighter generation, and long-range COMM/GPS support."
+      },
+      "Osan AB | Hex 107": {
+        role: "Korea MOB/FOS",
+        focus: "Survivability, North Korea/China proximity, access constraints, and route protection.",
+        watch: "Watch regional threat proximity, access limitations, missile threats, and sortie survivability."
+      }
+    };
+
+    const correctFosMarkers = [
+      { label: "Kadena AB | Hex 407", status: "Planning", note: "Forward Japan/Okinawa MOB/FOS", x: 55.6, y: 37.1 },
+      { label: "Yokota AB | Hex 209", status: "Planning", note: "Japan mobility/C2 support hub", x: 60.3, y: 27.4 },
+      { label: "Andersen AFB | Hex 609", status: "Planning", note: "Guam MOB/FOS sustainment hub", x: 75.0, y: 45.4 },
+      { label: "Osan AB | Hex 107", status: "Planning", note: "Korea MOB/FOS", x: 57.9, y: 21.5 }
+    ];
+
+    const geoZoneDetails = {
+      "GEO 1": "Western Pacific / East Asia | Primary Pacific Shield operational zone | Kadena, Yokota, Osan, Andersen support | Highest ISR, COMM, GPS, and threat priority.",
+      "GEO 2": "Southeast Asia / Indian Ocean | Mobility, sustainment, logistics, and alternate route support zone.",
+      "GEO 3": "Central CSpOC orbital bridge | Core ISR, SDA, missile warning, and global space coordination zone.",
+      "GEO 4": "Atlantic / Americas sustainment bridge | CONUS reinforcement and orbital transition zone.",
+      "GEO 5": "Pacific continuity / western return path | Reinforcement timing, Pacific orbital awareness, and strategic continuity zone."
+    };
+
+    const defaultGeoTurnTemplate = `Turn 1:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 2:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 3:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 4:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 5:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 6:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 7:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:
+
+Turn 8:
+- GEO focus:
+- Key satellites:
+- ISR/SDA findings:
+- Threats/jammers:
+- COMM/GPS opportunities:
+- MOB impact:
+- Recommended action:`;
+    let state = {
+      threats: [],
+      spaceRequests: [],
+      logs: [],
+      maps: {
+        geo: "",
+        theater: ""
+      },
+      theaterMarkers: [],
+      fos: fosNames.map(name => ({ name, number: name, status: "Planning", comm: "Unknown", jammer: "No", note: fosDetails[name]?.focus || "" }))
+    };
+
+    function getInputs() {
+      const ids = [
+        "mobBase", "gameTurn", "phase", "commStatus", "currentLook", "priority", "commanderIntent", "cspocRequest", "mobUpdate", "geoTurnNotes",
+        "reportThreat", "reportImpact", "reportRec", "generatedReport"
+      ];
+      const data = {};
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        data[id] = el.tagName === "DIV" ? el.textContent : el.value;
+      });
+      document.querySelectorAll(".persist[type='checkbox']").forEach(el => data[el.id] = el.checked);
+      return data;
+    }
+
+    function setInputs(data = {}) {
+      Object.entries(data).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.type === "checkbox") el.checked = Boolean(value);
+        else if (el.tagName === "DIV") el.textContent = value;
+        else el.value = value;
+      });
+    }
+
+    function saveAll(showAlert = true) {
+      state.inputs = getInputs();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      saveClock();
+      if (showAlert) alert("Saved. Your MOB LNO tracker is stored in this browser.");
+    }
+
+    function loadAll() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          state = JSON.parse(saved);
+          if (!state.fos || state.fos.length !== 4) state.fos = fosNames.map(name => ({ name, number: name, status: "Planning", comm: "Unknown", jammer: "No", note: fosDetails[name]?.focus || "" }));
+          if (!state.maps) state.maps = { geo: "", theater: "" };
+          if (!state.theaterMarkers) state.theaterMarkers = [];
+        } catch {
+          console.warn("Saved data could not be loaded.");
+        }
+      }
+      renderMaps();
+      renderFos();
+      renderThreats();
+      renderSpaceRequests();
+      renderLogs();
+      setInputs(state.inputs || {});
+      // Set default for geoTurnNotes if empty
+      const geoTurnNotesEl = document.getElementById("geoTurnNotes");
+      if (geoTurnNotesEl && !geoTurnNotesEl.value.trim()) {
+        geoTurnNotesEl.value = defaultGeoTurnTemplate;
+      }
+      loadClock();
+      startClockLoop();
+      updateClockDisplays();
+    }
+    function handleMapUpload(event, type) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        state.maps[type] = reader.result;
+        renderMaps();
+        saveAll(false);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function renderMaps() {
+      const geoPreview = document.getElementById("geoMapPreview");
+      const theaterPreview = document.getElementById("theaterMapPreview");
+      if (geoPreview) {
+        geoPreview.innerHTML = state.maps?.geo
+          ? `<img src="${state.maps.geo}" alt="Strategic GEO and CSpOC map" />`
+          : `<span>Upload GEO Zone / CSpOC map image</span>`;
+      }
+      if (theaterPreview) {
+        theaterPreview.innerHTML = state.maps?.theater
+          ? `<img src="${state.maps.theater}" alt="Theater and main game board map" />`
+          : `<span>Upload theater / main game board image</span>`;
+        renderTheaterMarkers();
+      }
+      renderMarkerTable();
+    }
+
+    function openMapModal(type) {
+      const imageData = state.maps?.[type];
+      if (!imageData) {
+        alert("Upload this map first.");
+        return;
+      }
+      const modal = document.getElementById("mapModal");
+      const modalImage = document.getElementById("mapModalImage");
+      const modalTitle = document.getElementById("mapModalTitle");
+      if (!modal || !modalImage || !modalTitle) return;
+      modalTitle.textContent = type === "geo" ? "Strategic GEO / CSpOC Map" : "Theater / Main Game Board";
+      modalImage.src = imageData;
+      modal.classList.add("active");
+      renderModalMarkers(type);
+    }
+
+    function closeMapModal(event) {
+      if (event) event.stopPropagation();
+      const modal = document.getElementById("mapModal");
+      if (modal) modal.classList.remove("active");
+    }
+
+    function clearMap(type) {
+      if (!confirm("Clear this uploaded map?")) return;
+      state.maps[type] = "";
+      renderMaps();
+      saveAll(false);
+    }
+
+    function setMapNote(note) {
+      const noteBox = document.getElementById("mapNoteBox");
+      if (noteBox) noteBox.textContent = note;
+    }
+
+    function getMarkerClass(status) {
+      if (status === "Operational") return "marker-operational";
+      if (status === "Building") return "marker-building";
+      if (status === "At Risk") return "marker-risk";
+      if (status === "Abandoning") return "marker-abandoning";
+      return "marker-planning";
+    }
+
+    function getMarkerShortLabel(label) {
+      if (label.includes("Kadena")) return "KAD";
+      if (label.includes("Yokota")) return "YOK";
+      if (label.includes("Andersen")) return "AND";
+      if (label.includes("Osan")) return "OSN";
+      return label.replace("FOS ", "F").slice(0, 4);
+    }
+
+    function handleTheaterMapClick(event) {
+      if (!state.maps?.theater) {
+        alert("Upload the theater map first.");
+        return;
+      }
+
+      if (event.target.classList.contains("map-marker")) return;
+
+      const preview = document.getElementById("theaterMapPreview");
+      const rect = preview.getBoundingClientRect();
+      const xPercent = ((event.clientX - rect.left) / rect.width) * 100;
+      const yPercent = ((event.clientY - rect.top) / rect.height) * 100;
+      const label = document.getElementById("markerLabel").value;
+      const status = document.getElementById("markerStatus").value;
+      const note = document.getElementById("markerNote").value.trim();
+
+      const existingIndex = state.theaterMarkers.findIndex(marker => marker.label === label);
+      const marker = {
+        label,
+        status,
+        note,
+        x: Number(xPercent.toFixed(2)),
+        y: Number(yPercent.toFixed(2))
+      };
+
+      if (existingIndex >= 0) state.theaterMarkers[existingIndex] = marker;
+      else state.theaterMarkers.push(marker);
+
+      renderTheaterMarkers();
+      renderMarkerTable();
+      saveAll(false);
+    }
+
+    function renderTheaterMarkers() {
+      const preview = document.getElementById("theaterMapPreview");
+      if (!preview || !state.theaterMarkers) return;
+      preview.querySelectorAll(".map-marker").forEach(marker => marker.remove());
+
+      state.theaterMarkers.forEach(marker => {
+        const markerEl = document.createElement("div");
+        markerEl.className = `map-marker ${getMarkerClass(marker.status)}`;
+        markerEl.style.left = `${marker.x}%`;
+        markerEl.style.top = `${marker.y}%`;
+        markerEl.title = `${marker.label} | ${marker.status}${marker.note ? " | " + marker.note : ""}`;
+        markerEl.innerHTML = `<span>${getMarkerShortLabel(marker.label)}</span>`;
+        markerEl.onclick = event => {
+          event.stopPropagation();
+          document.getElementById("markerLabel").value = marker.label;
+          document.getElementById("markerStatus").value = marker.status;
+          document.getElementById("markerNote").value = marker.note || "";
+          setMapNote(`${marker.label}: ${marker.status}${marker.note ? " - " + marker.note : ""}`);
+        };
+        preview.appendChild(markerEl);
+      });
+    }
+
+    function renderModalMarkers(type) {
+      const wrap = document.getElementById("modalMapWrap");
+      if (!wrap) return;
+      wrap.querySelectorAll(".map-marker").forEach(marker => marker.remove());
+      if (type !== "theater") return;
+
+      state.theaterMarkers.forEach(marker => {
+        const markerEl = document.createElement("div");
+        markerEl.className = `map-marker ${getMarkerClass(marker.status)}`;
+        markerEl.style.left = `${marker.x}%`;
+        markerEl.style.top = `${marker.y}%`;
+        markerEl.title = `${marker.label} | ${marker.status}${marker.note ? " | " + marker.note : ""}`;
+        markerEl.innerHTML = `<span>${getMarkerShortLabel(marker.label)}</span>`;
+        wrap.appendChild(markerEl);
+      });
+    }
+
+    function renderMarkerTable() {
+      const tbody = document.getElementById("markerTable");
+      if (!tbody) return;
+
+      tbody.innerHTML = state.theaterMarkers.map((marker, index) => `
+                <tr>
+                    <td>${escapeHtml(marker.label)}</td>
+                    <td>${escapeHtml(marker.status)}</td>
+                    <td>${escapeHtml(marker.note || "")}</td>
+                    <td>${marker.x.toFixed(1)}%, ${marker.y.toFixed(1)}%</td>
+                    <td><button class="red" onclick="deleteTheaterMarker(${index})">Delete</button></td>
+                </tr>
+            `).join("") || `<tr><td colspan="5" class="muted">No FOS markers placed yet.</td></tr>`;
+    }
+
+    function deleteTheaterMarker(index) {
+      state.theaterMarkers.splice(index, 1);
+      renderTheaterMarkers();
+      renderMarkerTable();
+      saveAll(false);
+    }
+
+    function clearTheaterMarkers() {
+      if (!confirm("Clear all FOS markers from the theater map?")) return;
+      state.theaterMarkers = [];
+      renderTheaterMarkers();
+      renderMarkerTable();
+      saveAll(false);
+    }
+
+    function loadCorrectFosMarkers() {
+      if (!state.maps?.theater) {
+        alert("Upload the theater map first, then load the correct FOS markers.");
+        return;
+      }
+
+      const confirmLoad = confirm("Load the four board-based MOB/FOS markers: Kadena AB Hex 407, Yokota AB Hex 209, Andersen AFB Hex 609, and Osan AB Hex 107? Existing markers will be replaced.");
+      if (!confirmLoad) return;
+
+      state.theaterMarkers = correctFosMarkers.map(marker => ({ ...marker }));
+      renderTheaterMarkers();
+      renderMarkerTable();
+      saveAll(false);
+      setMapNote("Loaded correct MOB/FOS markers from the board: Kadena 407, Yokota 209, Andersen 609, and Osan 107. Adjust manually if your uploaded image alignment differs.");
+    }
+
+    function resetAll() {
+      if (!confirm("Reset all MOB LNO tracker data?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(CLOCK_KEY);
+      location.reload();
+    }
+
+    function clearChecklist() {
+      document.querySelectorAll(".persist[type='checkbox']").forEach(el => el.checked = false);
+      saveAll(false);
+    }
+
+    function renderFos() {
+      const grid = document.getElementById("fosGrid");
+      grid.innerHTML = "";
+      state.fos.forEach((fos, index) => {
+        const statusClass = fos.status === "Operational" ? "pill-green" : fos.status === "At Risk" ? "pill-red" : fos.status === "Building" ? "pill-amber" : "pill-blue";
+        const details = fosDetails[fos.name] || { role: "MOB/FOS", focus: "Track mission support requirements.", watch: "Monitor threats, COMM, GPS, weather, and sustainment." };
+        const div = document.createElement("div");
+        div.className = "fos-card";
+        div.innerHTML = `
+          <h3>${fos.name} <span class="status-pill ${statusClass}">${fos.status}</span></h3>
+          <p class="small"><strong>Role:</strong> ${escapeHtml(details.role)}</p>
+          <p class="small"><strong>Primary Focus:</strong> ${escapeHtml(details.focus)}</p>
+          <p class="small"><strong>LNO Watch:</strong> ${escapeHtml(details.watch)}</p>
+          <div class="field">
+            <label>Location / Hex</label>
+            <input value="${escapeHtml(fos.number)}" onchange="updateFos(${index}, 'number', this.value)" placeholder="Ex: Kadena AB / Hex 407" />
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select onchange="updateFos(${index}, 'status', this.value)">
+              ${optionSet(["Planning", "Building", "Operational", "At Risk", "Abandoning"], fos.status)}
+            </select>
+          </div>
+          <div class="field">
+            <label>COMM Status</label>
+            <select onchange="updateFos(${index}, 'comm', this.value)">
+              ${optionSet(["Unknown", "Operational", "Voice Denied", "Data Denied", "COMM Denied"], fos.comm)}
+            </select>
+          </div>
+          <div class="field">
+            <label>Jammer Nearby?</label>
+            <select onchange="updateFos(${index}, 'jammer', this.value)">
+              ${optionSet(["No", "Yes", "Unknown"], fos.jammer)}
+            </select>
+          </div>
+          <div class="field">
+            <label>LNO Notes / Current Requirement</label>
+            <textarea onchange="updateFos(${index}, 'note', this.value)" placeholder="RFI status, threat proximity, sortie support, COMM/GPS needs">${escapeHtml(fos.note)}</textarea>
+          </div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    function updateFos(index, key, value) {
+      state.fos[index][key] = value;
+      saveAll(false);
+      renderFos();
+    }
+
+    function addThreat() {
+      const item = {
+        type: val("threatType"),
+        location: val("threatLocation"),
+        impact: val("threatImpact"),
+        recommendation: val("threatRecommendation")
+      };
+      if (!item.location && !item.impact && !item.recommendation) return alert("Add at least a location, impact, or recommendation.");
+      state.threats.push(item);
+      ["threatLocation", "threatImpact", "threatRecommendation"].forEach(id => document.getElementById(id).value = "");
+      renderThreats();
+      saveAll(false);
+    }
+
+    function renderThreats() {
+      const tbody = document.getElementById("threatTable");
+      tbody.innerHTML = state.threats.map((t, i) => `
+        <tr>
+          <td>${escapeHtml(t.type)}</td>
+          <td>${escapeHtml(t.location)}</td>
+          <td>${escapeHtml(t.impact)}</td>
+          <td>${escapeHtml(t.recommendation)}</td>
+          <td><button class="red" onclick="deleteThreat(${i})">Delete</button></td>
+        </tr>
+      `).join("") || `<tr><td colspan="5" class="muted">No threats logged yet.</td></tr>`;
+    }
+
+    function deleteThreat(index) { state.threats.splice(index, 1); renderThreats(); saveAll(false); }
+    function clearThreats() { if (confirm("Clear all threats?")) { state.threats = []; renderThreats(); saveAll(false); } }
+
+    function addSpaceRequest() {
+      const item = {
+        effect: val("spaceEffect"),
+        location: val("spaceLocation"),
+        purpose: val("spacePurpose"),
+        timing: val("spaceTiming"),
+        status: "Requested"
+      };
+      if (!item.location && !item.purpose) return alert("Add at least a target location or purpose.");
+      state.spaceRequests.push(item);
+      ["spaceLocation", "spacePurpose", "spaceTiming"].forEach(id => document.getElementById(id).value = "");
+      renderSpaceRequests();
+      saveAll(false);
+    }
+
+    function renderSpaceRequests() {
+      const tbody = document.getElementById("spaceTable");
+      tbody.innerHTML = state.spaceRequests.map((r, i) => `
+        <tr>
+          <td>${escapeHtml(r.effect)}</td>
+          <td>${escapeHtml(r.location)}</td>
+          <td>${escapeHtml(r.purpose)}</td>
+          <td>${escapeHtml(r.timing)}</td>
+          <td>
+            <select onchange="updateSpaceStatus(${i}, this.value)">
+              ${optionSet(["Requested", "Approved", "Denied", "Complete", "Pending"], r.status)}
+            </select>
+          </td>
+          <td><button class="red" onclick="deleteSpaceRequest(${i})">Delete</button></td>
+        </tr>
+      `).join("") || `<tr><td colspan="6" class="muted">No space effects requested yet.</td></tr>`;
+    }
+
+    function updateSpaceStatus(index, status) { state.spaceRequests[index].status = status; saveAll(false); }
+    function deleteSpaceRequest(index) { state.spaceRequests.splice(index, 1); renderSpaceRequests(); saveAll(false); }
+    function clearSpaceRequests() { if (confirm("Clear all space requests?")) { state.spaceRequests = []; renderSpaceRequests(); saveAll(false); } }
+
+    function buildReport() {
+      const mob = document.getElementById("mobBase")?.value || "MOB";
+      const look = document.getElementById("currentLook")?.value || "Current Look";
+      const report = `${mob} | ${look}\nTHREAT: ${val("reportThreat") || "N/A"}\nIMPACT: ${val("reportImpact") || "N/A"}\nRECOMMENDATION: ${val("reportRec") || "N/A"}`;
+      document.getElementById("generatedReport").textContent = report;
+      saveAll(false);
+    }
+
+    function copyReport() {
+      const text = document.getElementById("generatedReport").textContent;
+      navigator.clipboard.writeText(text).then(() => alert("Report copied."));
+    }
+
+    function addLog() {
+      const item = { time: val("logTime"), entry: val("logEntry") };
+      if (!item.time && !item.entry) return alert("Add a time/turn/look or entry.");
+      state.logs.push(item);
+      document.getElementById("logTime").value = "";
+      document.getElementById("logEntry").value = "";
+      renderLogs();
+      saveAll(false);
+    }
+
+    function renderLogs() {
+      const tbody = document.getElementById("logTable");
+      tbody.innerHTML = state.logs.map((l, i) => `
+        <tr>
+          <td>${escapeHtml(l.time)}</td>
+          <td>${escapeHtml(l.entry)}</td>
+          <td><button class="red" onclick="deleteLog(${i})">Delete</button></td>
+        </tr>
+      `).join("") || `<tr><td colspan="3" class="muted">No log entries yet.</td></tr>`;
+    }
+
+    function deleteLog(index) { state.logs.splice(index, 1); renderLogs(); saveAll(false); }
+    function clearLog() { if (confirm("Clear decision log?")) { state.logs = []; renderLogs(); saveAll(false); } }
+
+    function startMissionClock() {
+      if (!missionClock.running) {
+        missionClock.startTimestamp = Date.now();
+        missionClock.running = true;
+        saveClock();
+        startClockLoop();
+        updateClockDisplays();
+      }
+    }
+
+    function pauseMissionClock() {
+      if (!missionClock.running) return;
+      missionClock.accumulatedMs += Date.now() - missionClock.startTimestamp;
+      missionClock.startTimestamp = null;
+      missionClock.running = false;
+      saveClock();
+      updateClockDisplays();
+    }
+
+    function resetMissionClock() {
+      if (!confirm("Reset the mission clock only?")) return;
+      missionClock = { startTimestamp: null, accumulatedMs: 0, running: false };
+      saveClock();
+      updateClockDisplays();
+    }
+
+    function saveClock() {
+      localStorage.setItem(CLOCK_KEY, JSON.stringify(missionClock));
+    }
+
+    function loadClock() {
+      const savedClock = localStorage.getItem(CLOCK_KEY);
+      if (!savedClock) return;
+      try {
+        missionClock = JSON.parse(savedClock);
+      } catch {
+        missionClock = { startTimestamp: null, accumulatedMs: 0, running: false };
+      }
+    }
+
+    function startClockLoop() {
+      if (clockInterval) clearInterval(clockInterval);
+      clockInterval = setInterval(updateClockDisplays, 1000);
+    }
+
+    function getElapsedMs() {
+      if (!missionClock.running) return missionClock.accumulatedMs;
+      return missionClock.accumulatedMs + (Date.now() - missionClock.startTimestamp);
+    }
+
+    function getCurrentSegment(elapsedMinutes) {
+      return missionSegments.find(segment => elapsedMinutes >= segment.start && elapsedMinutes < segment.end) || missionSegments[missionSegments.length - 1];
+    }
+
+    function formatDuration(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+      const seconds = String(totalSeconds % 60).padStart(2, "0");
+      return `${hours}:${minutes}:${seconds}`;
+    }
+
+    function updateClockDisplays() {
+      const now = new Date();
+      const elapsedMs = getElapsedMs();
+      const elapsedMinutes = elapsedMs / 60000;
+      const segment = getCurrentSegment(elapsedMinutes);
+      const minutesIntoSegment = Math.max(0, Math.floor(elapsedMinutes - segment.start));
+      const minutesRemaining = Math.max(0, Math.ceil(segment.end - elapsedMinutes));
+
+      const localTimeEl = document.getElementById("localTimeDisplay");
+
+      const zuluTimeEl = document.getElementById("zuluTimeDisplay");
+
+      const dcTimeEl = document.getElementById("dcTimeDisplay");
+
+      const jpnTimeEl = document.getElementById("jpnTimeDisplay");
+
+      const guamTimeEl = document.getElementById("guamTimeDisplay");
+
+      const hickamTimeEl = document.getElementById("hickamTimeDisplay");
+
+      const elapsedEl = document.getElementById("missionElapsedDisplay");
+
+      const segmentEl = document.getElementById("segmentDisplay");
+
+      const timeOptions = { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false };
+
+      if (localTimeEl) localTimeEl.textContent = now.toLocaleTimeString([], timeOptions);
+
+      if (zuluTimeEl) zuluTimeEl.textContent = now.toLocaleTimeString("en-GB", { ...timeOptions, timeZone: "UTC" });
+
+      if (dcTimeEl) dcTimeEl.textContent = now.toLocaleTimeString("en-US", { ...timeOptions, timeZone: "America/New_York" });
+
+      if (jpnTimeEl) jpnTimeEl.textContent = now.toLocaleTimeString("en-US", { ...timeOptions, timeZone: "Asia/Tokyo" });
+
+      if (guamTimeEl) guamTimeEl.textContent = now.toLocaleTimeString("en-US", { ...timeOptions, timeZone: "Pacific/Guam" });
+
+      if (hickamTimeEl) hickamTimeEl.textContent = now.toLocaleTimeString("en-US", { ...timeOptions, timeZone: "Pacific/Honolulu" });
+
+      if (elapsedEl) elapsedEl.textContent = formatDuration(elapsedMs);
+
+      if (segmentEl) segmentEl.textContent = segment.name;
+
+      updateReminderPanel(segment, minutesIntoSegment, minutesRemaining);
+    }
+
+    function updateReminderPanel(segment, minutesIntoSegment, minutesRemaining) {
+      const panel = document.getElementById("primaryReminder");
+      if (!panel) return;
+
+      const dotClass = segment.hot ? "hot" : segment.warn ? "warn" : "";
+      const timeWarning = minutesRemaining <= 2 && missionClock.running
+        ? `<div class="reminder-item"><span class="reminder-dot hot"></span><span><strong>${minutesRemaining} minute(s) remaining in ${escapeHtml(segment.name)}.</strong> Prepare transition or final update now.</span></div>`
+        : "";
+
+      panel.innerHTML = `
+        <div class="reminder-item">
+          <span class="reminder-dot ${dotClass}"></span>
+          <span><strong>${escapeHtml(segment.name)}:</strong> ${escapeHtml(segment.reminder)}</span>
+        </div>
+        <div class="reminder-item">
+          <span class="reminder-dot warn"></span>
+          <span>Segment time: ${minutesIntoSegment} minute(s) in / ${minutesRemaining} minute(s) remaining.</span>
+        </div>
+        ${timeWarning}
+      `;
+    }
+
+    function markCurrentLook() {
+      const elapsedMinutes = getElapsedMs() / 60000;
+      const segment = getCurrentSegment(elapsedMinutes);
+      const currentLook = document.getElementById("currentLook");
+      if (!currentLook) return;
+      currentLook.value = segment.name;
+      saveAll(false);
+      updateClockDisplays();
+    }
+
+    function val(id) { return document.getElementById(id).value.trim(); }
+
+    function optionSet(options, selected) {
+      return options.map(opt => `<option value="${escapeHtml(opt)}" ${opt === selected ? "selected" : ""}>${escapeHtml(opt)}</option>`).join("");
+    }
+
+    function escapeHtml(str = "") {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    document.addEventListener("input", event => {
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) saveAll(false);
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeMapModal(event);
+    });
+
+    loadAll();
+  </script>
+</body>
+
+</html>
