@@ -1,3 +1,14 @@
+function ensureTrackerArrays() {
+	state.fos = Array.isArray(state.fos) ? state.fos : [];
+	state.threats = Array.isArray(state.threats) ? state.threats : [];
+	state.spaceRequests = Array.isArray(state.spaceRequests) ? state.spaceRequests : [];
+	state.logs = Array.isArray(state.logs) ? state.logs : [];
+}
+
+function getEl(id) {
+	return document.getElementById(id);
+}
+
 function clearChecklist() {
 	document.querySelectorAll(".persist[type='checkbox']").forEach(el => el.checked = false);
 	saveAll(false);
@@ -5,6 +16,8 @@ function clearChecklist() {
 
 function renderFos() {
 	const grid = document.getElementById("fosGrid");
+	if (!grid) return;
+	ensureTrackerArrays();
 	grid.innerHTML = "";
 	state.fos.forEach((fos, index) => {
 		const statusClass = fos.status === "Operational" ? "pill-green" : fos.status === "At Risk" ? "pill-red" : fos.status
@@ -54,27 +67,37 @@ function renderFos() {
 }
 
 function updateFos(index, key, value) {
+	ensureTrackerArrays();
+	if (!state.fos[index]) return;
 	state.fos[index][key] = value;
 	saveAll(false);
 	renderFos();
 }
 
 function addThreat() {
+	ensureTrackerArrays();
 	const item = {
 		type: val("threatType"),
 		location: val("threatLocation"),
 		impact: val("threatImpact"),
 		recommendation: val("threatRecommendation")
 	};
-	if (!item.location && !item.impact && !item.recommendation) return alert("Add at least a location, impact, or recommendation.");
+	if (!item.location && !item.impact && !item.recommendation) {
+		return alert("Add at least a location, impact, or recommendation.");
+	}
 	state.threats.push(item);
-	["threatLocation", "threatImpact", "threatRecommendation"].forEach(id => document.getElementById(id).value = "");
+	["threatLocation", "threatImpact", "threatRecommendation"].forEach(id => {
+		const el = getEl(id);
+		if (el) el.value = "";
+	});
 	renderThreats();
 	saveAll(false);
 }
 
 function renderThreats() {
 	const tbody = document.getElementById("threatTable");
+	if (!tbody) return;
+	ensureTrackerArrays();
 	tbody.innerHTML = state.threats.map((t, i) => `
   <tr>
     <td>${escapeHtml(t.type)}</td>
@@ -88,12 +111,24 @@ function renderThreats() {
   </tr>`;
 }
 
-function deleteThreat(index) { state.threats.splice(index, 1); renderThreats(); saveAll(false); }
+function deleteThreat(index) {
+	ensureTrackerArrays();
+	if (!state.threats[index]) return;
+	state.threats.splice(index, 1);
+	renderThreats();
+	saveAll(false);
+}
 function clearThreats() {
-	if (confirm("Clear all threats?")) { state.threats = []; renderThreats(); saveAll(false); }
+	ensureTrackerArrays();
+	if (confirm("Clear all threats?")) {
+		state.threats = [];
+		renderThreats();
+		saveAll(false);
+	}
 }
 
 function addSpaceRequest() {
+	ensureTrackerArrays();
 	const item = {
 		effect: val("spaceEffect"),
 		location: val("spaceLocation"),
@@ -103,13 +138,18 @@ function addSpaceRequest() {
 	};
 	if (!item.location && !item.purpose) return alert("Add at least a target location or purpose.");
 	state.spaceRequests.push(item);
-	["spaceLocation", "spacePurpose", "spaceTiming"].forEach(id => document.getElementById(id).value = "");
+	["spaceLocation", "spacePurpose", "spaceTiming"].forEach(id => {
+		const el = getEl(id);
+		if (el) el.value = "";
+	});
 	renderSpaceRequests();
 	saveAll(false);
 }
 
 function renderSpaceRequests() {
 	const tbody = document.getElementById("spaceTable");
+	if (!tbody) return;
+	ensureTrackerArrays();
 	tbody.innerHTML = state.spaceRequests.map((r, i) => `
   <tr>
     <td>${escapeHtml(r.effect)}</td>
@@ -128,41 +168,62 @@ function renderSpaceRequests() {
   </tr>`;
 }
 
-function updateSpaceStatus(index, status) { state.spaceRequests[index].status = status; saveAll(false); }
-function deleteSpaceRequest(index) { state.spaceRequests.splice(index, 1); renderSpaceRequests(); saveAll(false); }
+function updateSpaceStatus(index, status) {
+	ensureTrackerArrays();
+	if (!state.spaceRequests[index]) return;
+	state.spaceRequests[index].status = status;
+	renderSpaceRequests();
+	saveAll(false);
+}
+function deleteSpaceRequest(index) {
+	ensureTrackerArrays();
+	if (!state.spaceRequests[index]) return;
+	state.spaceRequests.splice(index, 1);
+	renderSpaceRequests();
+	saveAll(false);
+}
 function clearSpaceRequests() {
+	ensureTrackerArrays();
 	if (confirm("Clear all space requests?")) {
 		state.spaceRequests = [];
-		renderSpaceRequests(); saveAll(false);
+		renderSpaceRequests();
+		saveAll(false);
 	}
 }
 
 function buildReport() {
-	const mob = document.getElementById("mobBase")?.value || "MOB";
-	const look = document.getElementById("currentLook")?.value || "Current Look";
-	const report = `${mob} | ${look}\nTHREAT: ${val("reportThreat") || "N/A"}\nIMPACT: ${val("reportImpact") ||
-		"N/A"}\nRECOMMENDATION: ${val("reportRec") || "N/A"}`;
-	document.getElementById("generatedReport").textContent = report;
+	const mob = getEl("mobBase")?.value || "MOB";
+	const phase = getEl("currentLook")?.value || "Current Phase";
+	const report = `${mob} | ${phase}\nTHREAT: ${val("reportThreat") || "N/A"}\nIMPACT: ${val("reportImpact") || "N/A"}\nRECOMMENDATION: ${val("reportRec") || "N/A"}`;
+	const reportEl = getEl("generatedReport");
+	if (reportEl) reportEl.textContent = report;
 	saveAll(false);
 }
 
 function copyReport() {
-	const text = document.getElementById("generatedReport").textContent;
+	const text = getEl("generatedReport")?.textContent || "";
+	if (!text.trim()) return alert("No report to copy.");
+	if (!navigator.clipboard) return alert("Clipboard is not available in this browser.");
 	navigator.clipboard.writeText(text).then(() => alert("Report copied."));
 }
 
 function addLog() {
+	ensureTrackerArrays();
 	const item = { time: val("logTime"), entry: val("logEntry") };
 	if (!item.time && !item.entry) return alert("Add a time/turn/phase or entry.");
 	state.logs.push(item);
-	document.getElementById("logTime").value = "";
-	document.getElementById("logEntry").value = "";
+	const logTime = getEl("logTime");
+	const logEntry = getEl("logEntry");
+	if (logTime) logTime.value = "";
+	if (logEntry) logEntry.value = "";
 	renderLogs();
 	saveAll(false);
 }
 
 function renderLogs() {
 	const tbody = document.getElementById("logTable");
+	if (!tbody) return;
+	ensureTrackerArrays();
 	tbody.innerHTML = state.logs.map((l, i) => `
   <tr>
     <td>${escapeHtml(l.time)}</td>
@@ -174,5 +235,18 @@ function renderLogs() {
   </tr>`;
 }
 
-function deleteLog(index) { state.logs.splice(index, 1); renderLogs(); saveAll(false); }
-function clearLog() { if (confirm("Clear decision log?")) { state.logs = []; renderLogs(); saveAll(false); } }
+function deleteLog(index) {
+	ensureTrackerArrays();
+	if (!state.logs[index]) return;
+	state.logs.splice(index, 1);
+	renderLogs();
+	saveAll(false);
+}
+function clearLog() {
+	ensureTrackerArrays();
+	if (confirm("Clear decision log?")) {
+		state.logs = [];
+		renderLogs();
+		saveAll(false);
+	}
+}
